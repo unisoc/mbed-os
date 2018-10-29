@@ -19,7 +19,6 @@
 #include "secure_time_storage.h"
 #include "secure_time_crypto.h"
 #include "mbed_error.h"
-#include "platform/mbed_rtc_time.h"
 #include <string.h>
 
 #if SECURE_TIME_ENABLED
@@ -292,7 +291,7 @@ int32_t secure_time_set_trusted_commit_impl(const void *blob, size_t blob_size)
             // Set RTC with new time if it is around 1-2 minutes forward/backward
             // than current RTC time.
             if(llabs(new_time - rtc_time) > SECURE_TIME_MIN_RTC_LATENCY_SEC) {
-                set_time(new_time);
+                secure_time_update_rtc_time(new_time);
             }
 
             // Read the current stored time from secure storage.
@@ -337,9 +336,9 @@ static void set_time_forward(uint64_t new_time, uint64_t curr_os_time)
     secure_time_update_boot_time(new_time);
 
     // Set RTC with new time if it is around 1-2 minutes forward than current time.
-    uint64_t rtc_time = (uint64_t)time(NULL);
+    uint64_t rtc_time = secure_time_get_rtc_time();
     if((new_time - rtc_time) > SECURE_TIME_MIN_RTC_LATENCY_SEC) {
-        set_time(new_time);
+        secure_time_update_rtc_time(new_time);
     }
 
     // Write new time to secure storage entry of current stored time if it's more than 1 day forward
@@ -402,11 +401,33 @@ int32_t secure_time_set_impl(uint64_t new_time)
     return SECURE_TIME_SUCCESS;
 }
 
+#define SECURE_TIME_MAX(A, B)   ((A) > (B) ? (A) : (B))
+
 uint64_t secure_time_get_impl(void)
 {
     uint64_t boot_time = secure_time_get_boot_time();
     uint64_t secs_since_boot = secure_time_get_seconds_since_boot();
-    return (boot_time > 0) ? (boot_time + secs_since_boot) : 0;
+
+    // If boot_time is valid (not 0), we can return boot_time + secs_since_boot as current time.
+    // Otherwise, the best estimation we have is the latest between the RTC and the stored time.
+    if (boot_time > 0) {
+        return boot_time + secs_since_boot;
+    } else {
+        // Read the current stored time from secure storage
+        uint64_t stored_time = 0;
+        secure_time_get_stored_time(&stored_time);
+
+        // Get current RTC time
+        uint64_t rtc_time = secure_time_get_rtc_time();
+        
+        // Set new time according to the latest between the RTC and the stored time
+        uint64_t new_time = SECURE_TIME_MAX(stored_time, rtc_time);
+
+        // Update the latest boot time value for next calculations
+        secure_time_update_boot_time(new_time);
+
+        return new_time;
+    }
 }
 
 #endif // SECURE_TIME_ENABLED
