@@ -1,7 +1,7 @@
 ;/*****************************************************************************
-; * @file:    startup_RDA5991H.s
+; * @file:    startup_UWP5661.s
 ; * @purpose: CMSIS Cortex-M4 Core Device Startup File
-; *           for the RDA RDA5991H Device Series
+; *           for the UNISOC UWP566X Device Series
 ; * @version: V1.02, modified for mbed
 ; * @date:    07. June 2018
 ; *------- <<< Use Configuration Wizard in Context Menu >>> ------------------
@@ -76,14 +76,6 @@ Reset_Handler   PROC
                 LDR     R0, =SystemInit
                 BLX     R0
                 LDR     R0, =__main
-                BX      R0
-                ENDP
-
-; Soft Reset
-
-Soft_Reset      PROC
-                MOV     R1, #0x04
-                LDR     R0, [R1]
                 BX      R0
                 ENDP
 

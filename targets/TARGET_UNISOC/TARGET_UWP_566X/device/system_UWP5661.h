@@ -1,7 +1,7 @@
 /******************************************************************************
- * @file:    system_RDA5991H.h
+ * @file:    system_UWP5661.h
  * @purpose: CMSIS Cortex-M4 Device Peripheral Access Layer Header File
- *           for the RDA RDA5991H Device Series
+ *           for the UNISOC UWP566X Device Series
  * @version: V1.02
  * @date:    07. June 2018
  *----------------------------------------------------------------------------

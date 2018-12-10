@@ -1,5 +1,5 @@
 /**************************************************************************//**
- * @file     system_RDA5991H.c
+ * @file     system_UWP566X.c
  * @brief    CMSIS Cortex-M4 Device System Source File for
  *           RDA RDA5991H Device Series
  * @version  V1.11
@@ -34,7 +34,7 @@ extern "C" {
 #include "mbed_boot.h"
 #include "cmsis.h"
 
-/** @addtogroup RDA5991H_System
+/** @addtogroup UWP5661_System
  * @{
  */
 
@@ -84,7 +84,7 @@ extern "C" {
 
 
 
-/** @addtogroup RDA5991H_System_Defines  RDA5991H System Defines
+/** @addtogroup UWP566X_System_Defines  UWP566X System Defines
   @{
  */
 
@@ -108,14 +108,13 @@ extern "C" {
  */
 
 
-/** @addtogroup RDA5991H_System_Public_Variables  RDA5991H System Public Variables
+/** @addtogroup UWP566X_System_Public_Variables  UWP566X System Public Variables
   @{
  */
 /*----------------------------------------------------------------------------
   Clock Variable definitions
  *----------------------------------------------------------------------------*/
 uint32_t SystemCoreClock = CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC; /*!< System Clock Frequency (Core Clock)*/
-//uint32_t AHBBusClock     = RDA_BUS_CLK_FREQUENCY_80M;          /*!< AHB Bus Clock Frequency (Bus Clock)*/
 
 /**
  * @}
@@ -137,32 +136,7 @@ uint32_t SystemCoreClock = CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC; /*!< System Clock
  */
 void SystemCoreClockUpdate (void)            /* Get Core/Bus Clock Frequency     */
 {
-#if 0
-    uint32_t val = RDA_SCU->CORECFG;
-    /* Determine clock frequency according to SCU core config register values    */
-    switch ((val >> 12) & 0x03UL) {
-      case 0:
-        SystemCoreClock = RDA_SYS_CLK_FREQUENCY_40M;
-        break;
-      case 1:
-        SystemCoreClock = RDA_SYS_CLK_FREQUENCY_80M;
-        break;
-      case 2:
-      case 3:
-        SystemCoreClock = RDA_SYS_CLK_FREQUENCY_160M;
-        break;
-    }
-
-    /* Determine clock frequency according to SCU core config register values    */
-    switch ((val >> 11) & 0x01UL) {
-      case 0:
-        AHBBusClock = RDA_BUS_CLK_FREQUENCY_40M;
-        break;
-      case 1:
-        AHBBusClock = RDA_BUS_CLK_FREQUENCY_80M;
-        break;
-    }
-#endif
+    return;
 }
 
 static inline void uwp_glb_init(void)
