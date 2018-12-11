@@ -1,7 +1,7 @@
 /******************************************************************************
- * @file     RDA5991H.h
+ * @file     UWP_5661.h
  * @brief    CMSIS Cortex-M4 Core Peripheral Access Layer Header File for
- *           RDA RDA5991H Device Series
+ *           UNISOC UWP5661 Device Series
  * @version: V1.09
  * @date:    07. June 2018
  *
@@ -85,26 +85,23 @@ typedef enum IRQn
 #pragma no_anon_unions
 #endif
 
+/******************************************************************************/
+/*                 data type header and bit operation definition              */
+/******************************************************************************/
+#include "uwp_type.h"
 
 /******************************************************************************/
 /*                         Peripheral memory map                              */
 /******************************************************************************/
 
-
-/* Base addresses                                                            */
-//#define UWP_BOOT_FLASH_BASE   (0x00000000UL)
+/* Base addresses                                                             */
 #define UWP_IRAM_BASE         (0x00100000UL)
 #define UWP_DRAM_BASE         (0x00120000UL)
 #define UWP_FLASH_BASE        (0x02000000UL)
 
-
-
-/* AHB0 peripherals                                                           */
-
-
-/******************************************************************************/
-/*                         Peripheral declaration                             */
-/******************************************************************************/
-
+/* peripheral base address definition                                         */
+#include "uwp_hal_base.h"
+#include "uwp_hal_aon_glb.h"
+#include "uwp_hal_intc.h"
 
 #endif /* __RDA5991H_H__ */
