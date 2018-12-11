@@ -8,5 +8,6 @@
 #define MBED_CMSIS_H
 
 #include "cmsis_nvic.h"
+#include "UWP_5661.h"
 
 #endif

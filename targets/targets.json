@@ -7423,5 +7423,19 @@
     "UNO_91H": {
         "inherits": ["RDA5981X"],
         "detect_code": ["8001"]
+    },
+    "UNISOC_UWP": {
+        "inherits": ["Target"],
+        "core": "Cortex-M4",
+        "extra_labels": ["UNISOC"],
+        "default_lib": null,
+        "public": false,
+        "supported_toolchains": ["ARM","GCC_ARM","IAR"],
+        "macros": ["TWO_RAM_REGIONS"],
+        "device_has": ["FLASH"],
+        "release_versions": ["5"]
+    },
+    "UWP_566X": {
+        "inherits": ["UNISOC_UWP"]
     }
 }
