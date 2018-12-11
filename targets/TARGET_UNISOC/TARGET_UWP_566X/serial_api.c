@@ -284,6 +284,25 @@ int  serial_writable(serial_t *obj){
 	return malin_uart_tx_ready(uart);
 }
 
+// TODO: achieve following function
+
+void serial_break_set(serial_t *obj){
+    return;
+}
+
+void serial_break_clear(serial_t *obj){
+    return;
+}
+
+void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits){
+    return;
+}
+
+void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id){
+    return;
+}
+
+
 
 
 

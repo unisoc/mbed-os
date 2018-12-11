@@ -7427,12 +7427,12 @@
     "UNISOC_UWP": {
         "inherits": ["Target"],
         "core": "Cortex-M4",
-        "extra_labels": ["UNISOC"],
+        "extra_labels": ["UNISOC","FLASH_CMSIS_ALGO"],
         "default_lib": null,
         "public": false,
         "supported_toolchains": ["ARM","GCC_ARM","IAR"],
         "macros": ["TWO_RAM_REGIONS"],
-        "device_has": ["FLASH"],
+        "device_has": ["FLASH","SERIAL","INTERRUPTIN"],
         "release_versions": ["5"]
     },
     "UWP_566X": {
