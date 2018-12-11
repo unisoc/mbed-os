@@ -32,8 +32,6 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
-#include "UWP_5661.h"
-
 #define NVIC_NUM_VECTORS        (16 + 12)
 #define NVIC_RAM_VECTOR_ADDRESS (UWP_IRAM_BASE)
 

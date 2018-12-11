@@ -101,7 +101,12 @@ typedef enum IRQn
 
 /* peripheral base address definition                                         */
 #include "uwp_hal_base.h"
+#include "uwp_hal_sys.h"
 #include "uwp_hal_aon_glb.h"
+#include "uwp_hal_aon_clk.h"
 #include "uwp_hal_intc.h"
+#include "uwp_hal_sfc.h"
+#include "uwp_hal_sfc_cfg.h"
+#include "uwp_hal_sfc_phy.h"
 
 #endif /* __RDA5991H_H__ */
