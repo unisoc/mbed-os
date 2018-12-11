@@ -118,7 +118,7 @@ static const struct flash_driver_api flash_uwp_api = {
 };
 #endif
 
-int uwp_flash_init(struct spi_flash_struct*dev)
+int uwp_flash_init(struct spi_flash_struct *dev)
 {
 	int ret = 0;
 

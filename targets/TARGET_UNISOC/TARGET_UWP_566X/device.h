@@ -15,12 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __DEVICE_H
-#define __DEVICE_H
-
-#define DEVICE_SERIAL 1
-#define DEVICE_INTERRUPTIN 1
-
+#ifndef MBED_DEVICE_H
+#define MBED_DEVICE_H
 
 #ifdef __cplusplus
 extern "C" {
