@@ -26,8 +26,8 @@
 #define TMR_INT_RAW_STS         1
 #define TMR_INT_EN              0
 
-#define TIMER0_MAX_COUNT        (0xFFFFFFFF)        
-#define TIMER0_SHIFTBITS        (0) 
+#define TIMER0_MAX_COUNT        (0x07FFFFFF)   // 0xffffffff / 32     
+#define MULTIPLY26(X)           ((X<<4) + (X<<3) + (X<<1))
 
 typedef struct {
     volatile uint32_t load_l;
@@ -107,7 +107,7 @@ uint32_t us_ticker_read(void)
     uint32_t tick_readout = 0 ;
 
     core_util_critical_section_enter();
-    uint32_t ticker = timer0->shdw_l >> TIMER0_SHIFTBITS ;
+    uint32_t ticker = (uint32_t)(timer0->shdw_l + 13) / 26;
 
     if (us_ticker_interruptCount > ticker)
         tick_readout = (us_ticker_timestamp + us_ticker_interruptCount - ticker) % TIMER0_MAX_COUNT ;
@@ -132,7 +132,7 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
     CLR_BIT(timer0->ctl, BIT_TIMER_RUN);
 	SET_BIT(timer0->clr, TMR_INT_CLR);
 	SET_BIT(timer0->clr, TMR_INT_EN);
-	timer0->load_l = us_ticker_interruptCount << TIMER0_SHIFTBITS;
+	timer0->load_l = MULTIPLY26(us_ticker_interruptCount);
 	SET_BIT(timer0->ctl, BIT_TIMER_RUN);
     core_util_critical_section_exit();
 
@@ -193,8 +193,8 @@ const ticker_info_t* us_ticker_get_info()
 {
     static const ticker_info_t info =
     {
-        26000000,      // 5MHZ
-        32            // 29 bit counter
+        1000000,      // 1MHZ
+        27            // 27 bit counter
     };
     return &info;
 }
