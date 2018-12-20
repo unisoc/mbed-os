@@ -21,11 +21,11 @@
  ******************************************************************************/
 
 
-#ifndef __SYSTEM_UWP5661_H
-#define __SYSTEM_UWP5661_H
+#ifndef MBED_SYSTEM_UWP5661_H
+#define MBED_SYSTEM_UWP5661_H
 
 #ifdef __cplusplus
- extern "C" {
+    extern "C" {
 #endif
 
 extern uint32_t SystemCoreClock;     /*!< System Clock Frequency (Core Clock)  */
@@ -58,4 +58,4 @@ extern void SystemCoreClockUpdate (void);
 }
 #endif
 
-#endif /* __SYSTEM_RDA5991H_H */
+#endif /* __SYSTEM_UWP5661_H */

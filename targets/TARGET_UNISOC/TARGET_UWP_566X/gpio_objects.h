@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __GPIO_OBJECTS_H
-#define __GPIO_OBJECTS_H
+#ifndef MBED_GPIO_OBJECTS_H
+#define MBED_GPIO_OBJECTS_H
 
 #ifdef __cplusplus
 extern "C" {

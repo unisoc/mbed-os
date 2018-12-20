@@ -1,7 +1,7 @@
 /**************************************************************************//**
  * @file     system_UWP566X.c
  * @brief    CMSIS Cortex-M4 Device System Source File for
- *           RDA RDA5991H Device Series
+ *           UNISOC UWP566X Device Series
  * @version  V1.11
  * @date     12. June 2018
  *
@@ -21,17 +21,7 @@
  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
  *
  ******************************************************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-#include <stdint.h>
-#include "system_uwp5661.h"
-#include "uwp_hal_sys.h"
-#include "uwp_hal_aon_clk.h"
-#include "uwp_hal_aon_glb.h"
-#include "uwp_hal_sfc.h"
-#include "mbed_boot.h"
 #include "cmsis.h"
 
 /** @addtogroup UWP5661_System
@@ -177,8 +167,6 @@ static inline void uwp_glb_init(void)
  */
 void SystemInit (void)
 {
-
-
     uwp_glb_init();
 	
 #if ((__FPU_PRESENT == 1) && (__FPU_USED == 1))
@@ -191,11 +179,6 @@ void SystemInit (void)
     __enable_irq();
 
 }
-
-#ifdef __cplusplus
-}
-#endif
-
 
 /**
  * @}

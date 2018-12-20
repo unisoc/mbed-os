@@ -21,5 +21,7 @@ extern void sleep_cal_lpo(unsigned int calms);
 void mbed_sdk_init(void){
 	struct spi_flash_struct flash_test;
 	uwp_flash_init(&flash_test);
+	uwp_cache_init();
+
 }
 
