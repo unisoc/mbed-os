@@ -4,18 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __UWP_HAL_BASE_H
-#define __UWP_HAL_BASE_H
+#ifndef MBED_UWP_HAL_BASE_H
+#define MBED_UWP_HAL_BASE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define BIT(nr) (1UL << (nr))
-
-typedef unsigned int u32_t;
-typedef unsigned char u8_t;
-typedef int mem_addr_t;
+#include "uwp_type.h"
 
 #define BASE_IPI				0x40008000
 #define BASE_WDG				0x40010000
@@ -56,12 +52,12 @@ typedef int mem_addr_t;
 #define __REG_SET_ADDR(reg)		(reg + 0x1000)
 #define __REG_CLR_ADDR(reg)		(reg + 0x2000)
 
-static u32_t sci_read32(mem_addr_t addr)
+inline u32_t sci_read32(mem_addr_t addr)
 {
 	return *(volatile u32_t *)addr;
 }
 
-static void sci_write32(mem_addr_t addr, u32_t data)
+inline void sci_write32(mem_addr_t addr, u32_t data)
 {
 	*(volatile u32_t *)addr = data;
 }

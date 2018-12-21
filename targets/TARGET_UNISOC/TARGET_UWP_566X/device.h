@@ -18,15 +18,7 @@
 #ifndef MBED_DEVICE_H
 #define MBED_DEVICE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "objects.h"
 #include "serial_objects.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
