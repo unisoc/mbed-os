@@ -82,16 +82,16 @@ __isr_vector:
     .long    SysTick_Handler       /* SysTick Handler */
 
     /* External interrupts */
-    .long   SPIFLASH_IRQHandler         /* 16: SPI Flash                    */
-    .long   PTA_IRQHandler              /* 17: PTA                          */
-    .long   SDIO_IRQHandler             /* 18: SDIO                         */
-    .long   USBDMA_IRQHandler           /* 19: USB DMA                      */
-    .long   USB_IRQHandler              /* 20: USB                          */
-    .long   GPIO_IRQHandler             /* 21: GPIO                         */
-    .long   TIMER0_IRQHandler           /* 22: Timer0                       */
-    .long   UART0_IRQHandler            /* 23: UART0                        */
-    .long   MACHW_IRQHandler            /* 24: MAC Hardware                 */
-    .long   UART1_IRQHandler            /* 25: UART1                        */
+    .long   WCI2_IRQHandler             /* 16: SPI Flash                    */
+    .long   AON_IRQHandler              /* 17: PTA                          */
+    .long   TIMER0_IRQHandler           /* 18: SDIO                         */
+    .long   TIMER1_IRQHandler           /* 19: USB DMA                      */
+    .long   TIMER2_IRQHandler           /* 20: USB                          */
+    .long   SYSTEMTIMER_IRQHandler      /* 21: GPIO                         */
+    .long   UART0_IRQHandler            /* 22: Timer0                       */
+    .long   UART1_IRQHandler            /* 23: UART0                        */
+    .long   COMMONTIMER_IRQHandler      /* 24: MAC Hardware                 */
+    .long   WATCHDOG_IRQHandler         /* 25: UART1                        */
     .long   AHBDMA_IRQHandler           /* 26: AHB DMA                      */
     .long   PSRAM_IRQHandler            /* 27: PSRAM                        */
     .long   SDMMC_IRQHandler            /* 28: SDMMC                        */
@@ -180,16 +180,16 @@ Soft_Reset:
     .set      \handler_name, Default_Handler
     .endm
 
-    def_irq_default_handler     SPIFLASH_IRQHandler
-    def_irq_default_handler     PTA_IRQHandler
-    def_irq_default_handler     SDIO_IRQHandler
-    def_irq_default_handler     USBDMA_IRQHandler
-    def_irq_default_handler     USB_IRQHandler
-    def_irq_default_handler     GPIO_IRQHandler
+    def_irq_default_handler     WCI2_IRQHandler
+    def_irq_default_handler     AON_IRQHandler
     def_irq_default_handler     TIMER0_IRQHandler
+    def_irq_default_handler     TIMER1_IRQHandler
+    def_irq_default_handler     TIMER2_IRQHandler
+    def_irq_default_handler     SYSTEMTIMER_IRQHandler
     def_irq_default_handler     UART0_IRQHandler
-    def_irq_default_handler     MACHW_IRQHandler
     def_irq_default_handler     UART1_IRQHandler
+    def_irq_default_handler     COMMONTIMER_IRQHandler
+    def_irq_default_handler     WATCHDOG_IRQHandler
     def_irq_default_handler     AHBDMA_IRQHandler
     def_irq_default_handler     PSRAM_IRQHandler
     def_irq_default_handler     SDMMC_IRQHandler
