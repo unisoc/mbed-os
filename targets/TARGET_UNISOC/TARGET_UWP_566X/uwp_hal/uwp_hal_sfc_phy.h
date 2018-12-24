@@ -462,24 +462,24 @@ extern "C" {
 	void SFCDRV_SetCMDEncryptCfgReg(u32_t cmdmode);
 	void SFCDRV_SetCMDCfgReg(CMD_MODE_E cmdmode, BIT_MODE_E bitmode,
 			INI_ADD_SEL_E iniAddSel);
-	void SFCDRV_SoftReq(void);
+	//void SFCDRV_SoftReq(void);
 	void SFCDRV_CMD_BufClr(void);
-	void SFCDRV_TypeBufClr(void);
-	void SFCDRV_IntClr(void);
+	//void SFCDRV_TypeBufClr(void);
+	//void SFCDRV_IntClr(void);
 	u32_t SFCDRV_GetStatus(void);
 	void SFCDRV_CSTimingCfg(u32_t value);
 	void SFCDRV_RDTimingCfg(u32_t value);
 	void SFCDRV_ClkCfg(u32_t value);
 	void SFCDRV_CSCfg(u32_t value);
 	void SFCDRV_EndianCfg(u32_t value);
-	void SFCDRV_SetCMDBuf(CMD_BUF_INDEX_E index, u32_t value);
+	//void SFCDRV_SetCMDBuf(CMD_BUF_INDEX_E index, u32_t value);
 	void SFCDRV_SetCMDBufEx(CMD_BUF_INDEX_E index,
 		const u8_t *buf, u32_t count);
-	u32_t SFCDRV_GetCMDBuf(CMD_BUF_INDEX_E index);
-	void SFCDRV_SetTypeInfBuf(CMD_BUF_INDEX_E index,
+	//u32_t SFCDRV_GetCMDBuf(CMD_BUF_INDEX_E index);
+	/*void SFCDRV_SetTypeInfBuf(CMD_BUF_INDEX_E index,
 			BIT_MODE_E bitmode,
 			BYTE_NUM_E bytenum, CMD_MODE_E cmdmode,
-			SEND_MODE_E sendmode);
+			SEND_MODE_E sendmode);*/
 	void SFCDRV_ResetAllBuf(void);
 	void SFCDRV_SetReadBuf(SFC_CMD_DES_T *cmd_des_ptr,
 			u32_t cmd_flag);

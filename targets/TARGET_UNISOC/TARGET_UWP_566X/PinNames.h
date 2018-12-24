@@ -3,14 +3,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#ifndef __PINNAMES_H
-#define __PINNAMES_H
+#ifndef MBED_PINNAMES_H
+#define MBED_PINNAMES_H
 
 #ifdef __cpluscplus
 extern "C" {
 #endif
 
-typedef unsigned int uint32_t;
+#include "UWP_5661.h"
 
 /**
  * @name GPIO direction flags

@@ -13,7 +13,11 @@
 extern "C" {
 #endif
 
-#define __ramfunc static inline;
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+
+#define __ramfunc static inline
 #define TRUE  (1)
 #define FALSE (0)
 #define BIT(nr) (1UL << (nr))
@@ -26,16 +30,15 @@ extern "C" {
 #define clr_bits(value, addr)	\
 	(*(volatile unsigned long *)(addr)) &= ~(value)
 
-
-
 typedef unsigned int   u32_t;
 typedef unsigned short u16_t;
+typedef signed   short s16_t;
 typedef unsigned char  u8_t;
 typedef u32_t mem_addr_t;
 
 typedef enum{
 	TIMER_MODE_FREE,
-	TIMER_MODE_PERIOD,
+	TIMER_MODE_PERIOD
 }TIMER_MODE_T;
 
 typedef enum{
@@ -44,6 +47,15 @@ typedef enum{
 	TIMER_MODE_MAXA
 }TIMER_WID_MODE_T;
 
+static inline u32_t sys_read32(mem_addr_t addr)
+{
+	return *(volatile u32_t *)addr;
+}
+
+static inline void sys_write32(u32_t data, mem_addr_t addr)
+{
+	*(volatile u32_t *)addr = data;
+}
 
 #ifdef __cplusplus
 }
