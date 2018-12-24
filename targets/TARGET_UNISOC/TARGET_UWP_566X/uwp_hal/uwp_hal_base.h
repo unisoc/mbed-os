@@ -52,12 +52,12 @@ extern "C" {
 #define __REG_SET_ADDR(reg)		(reg + 0x1000)
 #define __REG_CLR_ADDR(reg)		(reg + 0x2000)
 
-inline u32_t sci_read32(mem_addr_t addr)
+static inline u32_t sci_read32(mem_addr_t addr)
 {
 	return *(volatile u32_t *)addr;
 }
 
-inline void sci_write32(mem_addr_t addr, u32_t data)
+static inline void sci_write32(mem_addr_t addr, u32_t data)
 {
 	*(volatile u32_t *)addr = data;
 }
