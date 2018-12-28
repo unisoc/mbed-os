@@ -32,7 +32,7 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
-#define NVIC_NUM_VECTORS        (16 + 12)
+#define NVIC_NUM_VECTORS        (16 + 51)
 #define NVIC_RAM_VECTOR_ADDRESS (UWP_IRAM_BASE)
 
 #endif

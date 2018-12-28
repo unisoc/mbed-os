@@ -4,8 +4,8 @@
 MEMORY
 {
     FLASH (rx)      : ORIGIN = 0x02000000, LENGTH = 128K
-    IRAM (rwx)      : ORIGIN = 0x00100080, LENGTH = (512K - 0x80)
-    DRAM (rwx)      : ORIGIN = 0x00180000, LENGTH = 451K
+    IRAM (rwx)      : ORIGIN = 0x0010010c, LENGTH = (512K - 0x10c)
+    DRAM (rwx)      : ORIGIN = 0x00180000, LENGTH = 408K
 /*    IDT_LIST (rwx)  : ORIGIN = 0x100000 + 920K, LENGTH = 2K   */
 }
 

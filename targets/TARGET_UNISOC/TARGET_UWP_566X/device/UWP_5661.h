@@ -49,7 +49,7 @@ typedef enum IRQn
   SysTick_IRQn                         = -1,       /*!< 15 Cortex-M4 System Tick Interrupt               */
 
 /******  RDA5991H Specific Interrupt Numbers *************************************************************/
-  INT_FIQ_IRQn                          = 0,        /*!< FIQ Interrupt                                   */
+  INT_FIQ_IRQn                         = 0,        /*!< FIQ Interrupt                                    */
   INT_IRQ_IRQn				           = 1, 	   /*!< IRQ Flash Interrupt			     			     */
   BT_MASKED_PAGE_TIMEOUT_INTR_IRQn     = 2,        /*!<                                                  */
   BT_MASKED_SYNC_DET_INTR_IRQn         = 3,        /*!<                                                  */
@@ -79,7 +79,8 @@ typedef enum IRQn
   UART0_IRQn                           = 35,       /*!< UART0 Interrupt                                  */
   UART1_IRQn                           = 36,       /*!< UART1 Interrupt                                  */
   COMTMR_IRQn                          = 37,       /*!< Common Timer Interrupt                           */
-  WATCHDOG_IRQn                        = 40,       /*!< UART1 Interrupt                                  */
+  WATCHDOG_IRQn                        = 40,       /*!< WATCHDOG Interrupt                               */
+  GNSS2BTWIFI_IPI_IRQn                 = 50,       /*!< GNSS2BTWIFI_IPI Interrupt                        */
 } IRQn_Type;
 
 

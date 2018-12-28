@@ -82,21 +82,57 @@ __isr_vector:
     .long    SysTick_Handler       /* SysTick Handler */
 
     /* External interrupts */
-    .long   WCI2_IRQHandler             /* 16: SPI Flash                    */
-    .long   AON_IRQHandler              /* 17: PTA                          */
-    .long   TIMER0_IRQHandler           /* 18: SDIO                         */
-    .long   TIMER1_IRQHandler           /* 19: USB DMA                      */
-    .long   TIMER2_IRQHandler           /* 20: USB                          */
-    .long   SYSTEMTIMER_IRQHandler      /* 21: GPIO                         */
-    .long   UART0_IRQHandler            /* 22: Timer0                       */
-    .long   UART1_IRQHandler            /* 23: UART0                        */
-    .long   COMMONTIMER_IRQHandler      /* 24: MAC Hardware                 */
-    .long   WATCHDOG_IRQHandler         /* 25: UART1                        */
-    .long   AHBDMA_IRQHandler           /* 26: AHB DMA                      */
-    .long   PSRAM_IRQHandler            /* 27: PSRAM                        */
-    .long   SDMMC_IRQHandler            /* 28: SDMMC                        */
-    .long   EXIF_IRQHandler             /* 29: EXIF                         */
-    .long   I2C_IRQHandler              /* 30: I2C                          */
+    .long    0                          /*  0:Reserved                      */
+    .long    0                          /*  1:Reserved                      */
+    .long    0                          /*  2:Reserved                      */
+    .long    0                          /*  3:Reserved                      */
+    .long    0                          /*  4:Reserved                      */
+    .long    0                          /*  5:Reserved                      */
+    .long    0                          /*  6:Reserved                      */
+    .long    0                          /*  7:Reserved                      */
+    .long    0                          /*  8:Reserved                      */
+    .long    0                          /*  9:Reserved                      */
+    .long    0                          /* 10:Reserved                      */
+    .long    0                          /* 11:Reserved                      */
+    .long    0                          /* 12:Reserved                      */
+    .long    0                          /* 13:Reserved                      */
+    .long    0                          /* 14:Reserved                      */
+    .long    0                          /* 15:Reserved                      */
+    .long    0                          /* 16:Reserved                      */
+    .long    0                          /* 17:Reserved                      */
+    .long   WCI2_IRQHandler             /* 18:WCI2_IRQHandler Flash         */
+    .long   INT_IPI_IRQHandler          /* 19:IPI                           */
+    .long   AON_IRQHandler              /* 20:AON                           */
+    .long   TIMER0_IRQHandler           /* 21:TIMER0                        */
+    .long   TIMER1_IRQHandler           /* 22:TIMER1                        */
+    .long   TIMER2_IRQHandler           /* 23:TIMER2                        */
+    .long    0                          /* 24:Reserved                      */
+    .long    0                          /* 25:Reserved                      */
+    .long   SYSTMR_IRQHandler           /* 26: SYSTEM TIMER                 */
+    .long    0                          /* 27:Reserved                      */
+    .long    0                          /* 28:Reserved                      */
+    .long    0                          /* 29:Reserved                      */
+    .long    0                          /* 30:Reserved                      */
+    .long   WIFI_CAP_IRQHanler          /* 31:REQ_WIFI_CAP                  */
+    .long   DPD_IRQHandler              /* 32:UART0                         */
+    .long   MAC_IRQHandler              /* 33:MAC Hardware                  */
+    .long    0                          /* 34:Reserved                      */
+    .long   UART0_IRQHandler            /* 35:UART0                         */
+    .long   UART1_IRQHandler            /* 36:AHB DMA                       */
+    .long   COMTMR_IRQHandler           /* 37:COMMON TIMER                  */
+    .long    0                          /* 38:Reserved                      */
+    .long    0                          /* 39:Reserved                      */
+    .long   WTHDOG_IRQHandler           /* 40:WATCHDOG                      */
+    .long    0                          /* 41:Reserved                      */
+    .long    0                          /* 42:Reserved                      */
+    .long    0                          /* 43:Reserved                      */
+    .long    0                          /* 44:Reserved                      */
+    .long    0                          /* 45:Reserved                      */
+    .long    0                          /* 46:Reserved                      */
+    .long    0                          /* 47:Reserved                      */
+    .long    0                          /* 48:Reserved                      */
+    .long    0                          /* 49:Reserved                      */
+    .long   GNSS2BTWIFI_IPI_IRQHandler  /* 50:GNSS2BTWIFI_IPI               */
 
 
     .size    __isr_vector, . - __isr_vector
@@ -181,19 +217,19 @@ Soft_Reset:
     .endm
 
     def_irq_default_handler     WCI2_IRQHandler
+    def_irq_default_handler     INT_IPI_IRQHandler
     def_irq_default_handler     AON_IRQHandler
     def_irq_default_handler     TIMER0_IRQHandler
     def_irq_default_handler     TIMER1_IRQHandler
     def_irq_default_handler     TIMER2_IRQHandler
-    def_irq_default_handler     SYSTEMTIMER_IRQHandler
+    def_irq_default_handler     SYSTMR_IRQHandler
     def_irq_default_handler     UART0_IRQHandler
     def_irq_default_handler     UART1_IRQHandler
-    def_irq_default_handler     COMMONTIMER_IRQHandler
-    def_irq_default_handler     WATCHDOG_IRQHandler
-    def_irq_default_handler     AHBDMA_IRQHandler
-    def_irq_default_handler     PSRAM_IRQHandler
-    def_irq_default_handler     SDMMC_IRQHandler
-    def_irq_default_handler     EXIF_IRQHandler
-    def_irq_default_handler     I2C_IRQHandler
+    def_irq_default_handler     COMTMR_IRQHandler
+    def_irq_default_handler     WTHDOG_IRQHandler
+    def_irq_default_handler     WIFI_CAP_IRQHanler
+    def_irq_default_handler     DPD_IRQHandler
+    def_irq_default_handler     MAC_IRQHandler
+    def_irq_default_handler     GNSS2BTWIFI_IPI_IRQHandler
 
     .end

@@ -8,7 +8,7 @@
 #define UWP_USER_FLASH_BASE   (0x02200000) /* 1280k for user data  */
 
 #define UWP_IRAM_SIZE         (0x00080000) /* ???512k              */
-#define UWP_DRAM_SIZE         (0x00070C00) /* ???451k              */
+#define UWP_DRAM_SIZE         (0x00066000) /* ???920k-512k=408k    */
 #define UWP_BOOT_FLASH_SIZE   (0x00020000) /* 128k                 */
 #define UWP_APP_FLASH_SIZE    (0x00080000) /* 512k                 */
 #define UWP_MODEM_FLASH_SIZE  (0x000A0000) /* 640k                 */
@@ -20,11 +20,11 @@ LR_IROM1 UWP_BOOT_FLASH_BASE UWP_BOOT_FLASH_SIZE  {                ; load region
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  ; 8_byte_aligned(31 vect * 4 bytes) =  8_byte_aligned(0x7C) = 0x80
-  ER_IRAMVEC UWP_IRAM_BASE EMPTY 0x80  {        ; Reserved for vectors
+  ; 8_byte_aligned(31 vect * 4 bytes) =  8_byte_aligned(0x10C) = 0x110
+  ER_IRAMVEC UWP_IRAM_BASE EMPTY 0x110  {        ; Reserved for vectors
   }
-  ; IRAM Size: Total(128KB) - Vector(128B) - Stack(2KB)
-  RW_IRAM1 AlignExpr(+0, 8) (0x20000 - 0x80 - 0x800)  {
+  ; IRAM Size: Total(128KB) - Vector(272B) - Stack(2KB)
+  RW_IRAM1 AlignExpr(+0, 8) (0x20000 - 0x110 - 0x800)  {
    uwp_hal_sfc.o (+RO)
    uwp_hal_sfc_phy.o (+RO)
    ramfunc_flash_api.o (+RO)
