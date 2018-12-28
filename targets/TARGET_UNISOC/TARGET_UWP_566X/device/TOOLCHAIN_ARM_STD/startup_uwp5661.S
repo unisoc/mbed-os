@@ -46,21 +46,57 @@ __Vectors       DCD     |Image$$ARM_LIB_STACK$$ZI$$Limit| ; Top of Stack
                 DCD     SysTick_Handler           ; SysTick Handler
 
                 ; External Interrupts
-                DCD     WCI2_IRQHandler           ; 16: SPI Flash
-                DCD     AON_IRQHandler            ; 17: PTA
-                DCD     TIMER0_IRQHandler         ; 18: SDIO
-                DCD     TIMER1_IRQHandler         ; 19: USB DMA
-                DCD     TIMER2_IRQHandler         ; 20: USB
-                DCD     SYSTEMTIMER_IRQHandler    ; 21: GPIO
-                DCD     UART0_IRQHandler          ; 22: Timer0
-                DCD     UART1_IRQHandler          ; 23: UART0
-                DCD     COMMONTIMER_IRQHandler    ; 24: MAC Hardware
-                DCD     WATCHDOG_IRQHandler       ; 25: UART1
-                DCD     AHBDMA_IRQHandler         ; 26: AHB DMA
-                DCD     PSRAM_IRQHandler          ; 27: PSRAM
-                DCD     SDMMC_IRQHandler          ; 28: SDMMC
-                DCD     EXIF_IRQHandler           ; 29: EXIF
-                DCD     I2C_IRQHandler            ; 30: I2C
+                DCD     0                         ;  0:Reserved  
+                DCD     0                         ;  1:Reserved
+                DCD     0                         ;  2:Reserved  
+                DCD     0                         ;  3:Reserved 
+                DCD     0                         ;  4:Reserved  
+                DCD     0                         ;  5:Reserved
+                DCD     0                         ;  6:Reserved  
+                DCD     0                         ;  7:Reserved 
+                DCD     0                         ;  8:Reserved  
+                DCD     0                         ;  9:Reserved
+                DCD     0                         ; 10:Reserved  
+                DCD     0                         ; 11:Reserved 
+                DCD     0                         ; 12:Reserved  
+                DCD     0                         ; 13:Reserved
+                DCD     0                         ; 14:Reserved  
+                DCD     0                         ; 15:Reserved 
+                DCD     0                         ; 16:Reserved
+                DCD     0                         ; 17:Reserved
+                DCD     WCI2_IRQHandler           ; 18:WCI2_IRQHandler Flash
+                DCD     INT_IPI_IRQHandler        ; 19:IPI
+                DCD     AON_IRQHandler            ; 20:AON
+                DCD     TIMER0_IRQHandler         ; 21:TIMER0
+                DCD     TIMER1_IRQHandler         ; 22:TIMER1
+                DCD     TIMER2_IRQHandler         ; 23:TIMER2
+                DCD     0                         ; 24:Reserved
+                DCD     0                         ; 25:Reserved
+                DCD     SYSTMR_IRQHandler         ; 26: SYSTEM TIMER
+                DCD     0                         ; 27:Reserved
+                DCD     0                         ; 28:Reserved
+                DCD     0                         ; 29:Reserved
+                DCD     0                         ; 30:Reserved
+                DCD     WIFI_CAP_IRQHanler        ; 31:REQ_WIFI_CAP
+                DCD     DPD_IRQHandler            ; 32:UART0
+                DCD     MAC_IRQHandler            ; 33:MAC Hardware
+                DCD     0                         ; 34:Reserved
+                DCD     UART0_IRQHandler          ; 35:UART0
+                DCD     UART1_IRQHandler          ; 36:AHB DMA
+                DCD     COMTMR_IRQHandler         ; 37:COMMON TIMER
+                DCD     0                         ; 38:Reserved
+                DCD     0                         ; 39:Reserved
+                DCD     WTHDOG_IRQHandler         ; 40:WATCHDOG
+                DCD     0                         ; 41:Reserved
+                DCD     0                         ; 42:Reserved
+                DCD     0                         ; 43:Reserved  
+                DCD     0                         ; 44:Reserved
+                DCD     0                         ; 45:Reserved  
+                DCD     0                         ; 46:Reserved 
+                DCD     0                         ; 47:Reserved  
+                DCD     0                         ; 48:Reserved
+                DCD     0                         ; 49:Reserved 
+                DCD     GNSS2BTWIFI_IPI_IRQHandler; 50:GNSS2BTWIFI_IPI
 
 
 
@@ -130,32 +166,31 @@ Default_Handler PROC
                 EXPORT  TIMER0_IRQHandler         [WEAK]
                 EXPORT  TIMER1_IRQHandler         [WEAK]
                 EXPORT  TIMER2_IRQHandler         [WEAK]
-                EXPORT  SYSTEMTIMER_IRQHandler    [WEAK]
+                EXPORT  SYSTMR_IRQHandler         [WEAK]
                 EXPORT  UART0_IRQHandler          [WEAK]
                 EXPORT  UART1_IRQHandler          [WEAK]
-                EXPORT  COMMONTIMER_IRQHandler    [WEAK]
-                EXPORT  WATCHDOG_IRQHandler       [WEAK]
-                EXPORT  AHBDMA_IRQHandler         [WEAK]
-                EXPORT  PSRAM_IRQHandler          [WEAK]
-                EXPORT  SDMMC_IRQHandler          [WEAK]
-                EXPORT  EXIF_IRQHandler           [WEAK]
-                EXPORT  I2C_IRQHandler            [WEAK]
+                EXPORT  COMTMR_IRQHandler         [WEAK]
+                EXPORT  WTHDOG_IRQHandler         [WEAK]
+                EXPORT  WIFI_CAP_IRQHanler        [WEAK]
+                EXPORT  DPD_IRQHandler            [WEAK]
+                EXPORT  MAC_IRQHandler            [WEAK]
+                EXPORT  GNSS2BTWIFI_IPI_IRQHandler[WEAK]
 
 WCI2_IRQHandler
 AON_IRQHandler
 TIMER0_IRQHandler
 TIMER1_IRQHandler
 TIMER2_IRQHandler
-SYSTEMTIMER_IRQHandler
+SYSTMR_IRQHandler
 UART0_IRQHandler
 UART1_IRQHandler
-COMMONTIMER_IRQHandler
-WATCHDOG_IRQHandler
-AHBDMA_IRQHandler
-PSRAM_IRQHandler
-SDMMC_IRQHandler
-EXIF_IRQHandler
-I2C_IRQHandler
+COMTMR_IRQHandler
+WTHDOG_IRQHandler
+INT_IPI_IRQHandler
+WIFI_CAP_IRQHanler
+DPD_IRQHandler
+MAC_IRQHandler
+GNSS2BTWIFI_IPI_IRQHandler
 
                 B       .
 
