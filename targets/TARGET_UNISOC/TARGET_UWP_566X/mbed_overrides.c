@@ -24,6 +24,8 @@ void mbed_sdk_init(void){
 	struct spi_flash_struct flash_test;
 	uwp_flash_init(&flash_test);
 	uwp_cache_init();
+	intc_uwp_init();
+	aon_intc_uwp_init();
 }
 
 void mbed_main(void){
@@ -31,7 +33,6 @@ void mbed_main(void){
 	u32_t rdptr = 0x001eff08;
 	sipc_init();
     ipi_uwp_init();
-	//uwp_init(&uwp_wifi, WIFI_MODE_STA);
-	//printf("%d %d\r\n",*(volatile u32_t*)wrptr,*(volatile u32_t*)rdptr);
+	uwp_init(&uwp_wifi, WIFI_MODE_STA);
 }
 
