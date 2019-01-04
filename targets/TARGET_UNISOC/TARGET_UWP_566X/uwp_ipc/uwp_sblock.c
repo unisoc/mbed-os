@@ -408,8 +408,6 @@ int sblock_get(u8_t dst, u8_t channel, struct sblock *blk, int timeout)
 
 	ring = &sblock->ring;
 	poolhd = (volatile struct sblock_ring_header *)(&ring->header->pool);
-	LOG_DBG("%d %d ch=%d", poolhd->txblk_rdptr,
-		poolhd->txblk_wrptr, channel);
 
 	if (poolhd->txblk_rdptr == poolhd->txblk_wrptr) {
 		ret = k_sem_acquire(ring->getwait, timeout);
