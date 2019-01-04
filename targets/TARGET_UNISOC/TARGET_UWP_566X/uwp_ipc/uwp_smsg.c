@@ -69,10 +69,6 @@ void uwp_ipi_set_callback(uwp_ipi_callback_t cb, void *arg){
 }
 */
 
-
-
-
-
 void sipc_init_smsg_queue_buf(struct smsg_queue_buf *buf,
 		u32_t size, u32_t addr, u32_t rdptr, u32_t wrptr)
 {
@@ -159,6 +155,7 @@ void smsg_msg_dispatch_thread(const char *arg)
 	struct smsg_queue_buf *rx_buf;
 
 	while (1) {
+
 		k_sem_acquire(ipc->irq_sem, K_FOREVER);
 
 		for (prio = QUEUE_PRIO_IRQ; prio < QUEUE_PRIO_MAX; prio++) {
@@ -177,10 +174,12 @@ void smsg_msg_dispatch_thread(const char *arg)
 			memcpy(&recv_smsg, msg, sizeof(struct smsg));
 			sys_write32(sys_read32(rx_buf->rdptr) + 1,
 					rx_buf->rdptr);
-			LOG_DBG("read smsg: channel=%d, type=%d, flag=0x%04x, value=0x%08x %d %d\n",
+
+			LOG_DBG("read smsg: channel=%d, type=%d, flag=0x%04x, value=0x%08x %d %d",
 					msg->channel, msg->type, msg->flag,
 					msg->value, sys_read32(rx_buf->wrptr),
 					sys_read32(rx_buf->rdptr));
+
 			if (recv_smsg.channel >= SMSG_CH_NR
 					|| recv_smsg.type >= SMSG_TYPE_NR
 					|| SMSG_TYPE_DIE == recv_smsg.type) {
@@ -214,7 +213,6 @@ void smsg_msg_dispatch_thread(const char *arg)
 static void smsg_irq_handler(void *arg)
 {
 	struct smsg_ipc *ipc = (struct smsg_ipc *)arg;
-    //printk("%s\r\n",__func__);
 	k_sem_release(ipc->irq_sem);
 }
 
@@ -249,7 +247,11 @@ int smsg_ch_open(u8_t dst, u8_t channel, int prio, int timeout)
 
 	ch->rxsem = k_sem_create(1, 0);
 	ch->rxlock = k_mutex_create();
-	ch->txlock = k_mutex_create();
+
+    if(ch->txlock == NULL)
+	    ch->txlock = k_mutex_create();
+    else
+		LOG_ERR("channel:%d txlock has created",channel);
 
 	smsg_set(&mopen, channel, SMSG_TYPE_OPEN, SMSG_OPEN_MAGIC, 0);
 	ret = smsg_send(dst, prio, &mopen, timeout);
@@ -349,7 +351,7 @@ int smsg_send(u8_t dst, u8_t prio, struct smsg *msg, int timeout)
 
 	tx_buf = &(ipc->queue[prio].tx_buf);
 
-	LOG_DBG("%d smsg txbuf wr %d rd %d!\n", prio,
+	LOG_DBG("%d smsg txbuf wr %d rd %d!", prio,
 			sys_read32(tx_buf->wrptr),
 			sys_read32(tx_buf->rdptr));
 
@@ -360,6 +362,12 @@ int smsg_send(u8_t dst, u8_t prio, struct smsg *msg, int timeout)
 				sys_read32(tx_buf->rdptr));
 
 		return -EBUSY;
+	}
+
+    /* sometimes response to CP however the channel is not created at AP */
+	if(ch->txlock == NULL){
+		LOG_ERR("channel:%d create txlock",msg->channel);
+        ch->txlock = k_mutex_create();
 	}
 
 	k_mutex_lock(ch->txlock, K_FOREVER);
@@ -400,11 +408,6 @@ int smsg_init(u32_t dst, u32_t smsg_base)
 	ipc->irq_sem = k_sem_create(1, 0);
 
     ipc->pid = k_thread_create("smsg_thread",smsg_msg_dispatch_thread,NULL,NULL,SMSG_STACK_SIZE,osPriorityNormal);
-/*	ipc->pid = k_thread_create(&smsg_thread,
-			smsg_stack, SMSG_STACK_SIZE,
-			(k_thread_entry_t)smsg_msg_dispatch_thread,
-			NULL, NULL, NULL,
-			 K_PRIO_COOP(7), 0, 0);*/
 
-	return 0;
+	return (ipc->pid == NULL);
 }

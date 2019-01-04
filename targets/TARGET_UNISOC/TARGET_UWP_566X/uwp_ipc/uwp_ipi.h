@@ -16,7 +16,7 @@ extern "C"{
 typedef void (*uwp_ipi_callback_t) (void *data);
 extern void uwp_ipi_set_callback(uwp_ipi_callback_t cb, void *arg);
 extern void uwp_ipi_unset_callback(void);
-int ipi_uwp_init(void);
+void ipi_uwp_init(void);
 
 static inline void uwp_ipi_irq_trigger(void)
 {
