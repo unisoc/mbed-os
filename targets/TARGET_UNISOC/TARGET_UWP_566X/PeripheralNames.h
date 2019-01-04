@@ -10,4 +10,5 @@
 #define STDIO_UART_TX NC
 #define STDIO_UART_RX NC
 
+#define MBED_UARTUSB      USBTX, USBRX
 #endif

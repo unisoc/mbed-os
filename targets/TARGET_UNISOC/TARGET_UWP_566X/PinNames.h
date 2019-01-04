@@ -34,9 +34,11 @@ typedef enum {
 typedef enum {
     PIN0 = 0,
     PIN1,
-	PIN2,
-	PIN3,
-	NC
+    PIN2,
+    PIN3,
+    NC,
+    USBRX   = NC,
+    USBTX   = NC,
 } PinName;
 
 // TODO: pinmode porting to gpio_api.h

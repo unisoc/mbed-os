@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 #include "cmsis.h"
-#include "uwp_wifi_main.h"
-extern void sleep_cal_lpo(unsigned int calms);
-extern struct wifi_priv uwp_wifi;
+//#include "uwp_wifi_main.h"
+//extern void sleep_cal_lpo(unsigned int calms);
+//extern struct wifi_priv uwp_wifi;
 
 
 /* This function is called after RAM initialization and before main. */
