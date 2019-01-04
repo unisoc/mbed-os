@@ -8,6 +8,8 @@
 
 #include "UWP_5661.h"
 #include "uwp_log.h"
+#include "uwp_sipc.h"
+#include "uwp_type.h"
 
 #if 0
 
@@ -327,38 +329,52 @@ int wifi_irq_init(void)
 }
 #endif
 
+// TODO: parameter arg mean ???
+static void wifi_aon_irq_handler(int ch, void *arg)
+{
+	struct smsg msg;
+	s32_t irq = (s32_t)arg;
+
+	LOG_INF("wifi irq aon %d\n", irq);
+	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, (irq + 50));
+	smsg_send_irq(SIPC_ID_AP, &msg);
+
+}
+
+// TODO: parameter arg mean ???
 static int wifi_int_irq_handler(void *arg)
 {
-/*
+
 	struct smsg msg;
 	s32_t irq = (s32_t)arg;
 
 	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
 	smsg_send_irq(SIPC_ID_AP, &msg);
-*/
-    mbed_error_printf("%s\r\n",__func__);
+
 	return 0;
 }
 
-int wifi_irq_init(void)
+void wifi_irq_init(void)
 {
+    NVIC_DisableIRQ(MAC_IRQn);
 	NVIC_SetVector(MAC_IRQn,wifi_int_irq_handler);
 	NVIC_SetPriority(MAC_IRQn,0x1FUL);
 
+    NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
 	NVIC_SetVector(REQ_WIFI_CAP_IRQn,wifi_int_irq_handler);
 	NVIC_SetPriority(REQ_WIFI_CAP_IRQn,0x1FUL);
-	
+
+    NVIC_DisableIRQ(DPD_IRQn);
 	NVIC_SetVector(DPD_IRQn,wifi_int_irq_handler);
 	NVIC_SetPriority(DPD_IRQn,0x1FUL);
 
+    NVIC_DisableIRQ(COMTMR_IRQn);
 	NVIC_SetVector(COMTMR_IRQn,wifi_int_irq_handler);
 	NVIC_SetPriority(COMTMR_IRQn,0x1FUL);
 
-/*
 	uwp_aon_intc_set_irq_callback(AON_INT_IRQ_REQ_BB_TS,
 		wifi_aon_irq_handler, (void *)AON_INT_IRQ_REQ_BB_TS);
-*/
-	return 0;
+
 }
 
 void sprd_wifi_irq_enable_num(u32_t num)
