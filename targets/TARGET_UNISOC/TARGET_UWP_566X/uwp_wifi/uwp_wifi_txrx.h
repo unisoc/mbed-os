@@ -47,13 +47,16 @@ extern "C"{
 			addr = addr - SPRD_AP_CP_DRAM_MAP_BASE; }	      \
 	} while (0)
 
+PACK_STRUCT_BEGIN
 struct sprdwl_common_hdr {
 	u8_t type : 3;
 	u8_t direction_ind : 1;
 	u8_t buffer_type : 1;
 	u8_t interface : 3;
-};
+}PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
 
+PACK_STRUCT_BEGIN
 struct tx_ctrl {
 	/* 1:need HW to do checksum */
 	unsigned char checksum_offload : 1;
@@ -70,7 +73,8 @@ struct tx_ctrl {
 	unsigned char swq_flag : 1;
 	unsigned char rsvd : 2;
 	unsigned char pcie_mh_readcomp : 1;
-};
+}PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
 
 /* NOTE: MUST not modify, defined by HW */
 /* It still change now */
@@ -225,6 +229,7 @@ struct tx_msdu_dscr {
 	unsigned char next_buf_addr_high;
 	struct sprdwl_common_hdr common;
 	unsigned char offset;
+    PACK_STRUCT_BEGIN
 	struct {
 		/* 1:need HW to do checksum. */
 		unsigned char checksum_offload : 1;
@@ -242,7 +247,8 @@ struct tx_msdu_dscr {
 		unsigned char rsvd : 2;
 		/* Used by PCIe address buffer, need set default: 1. */
 		unsigned char pcie_mh_readcomp : 1;
-	} tx_ctrl;
+	} PACK_STRUCT_STRUCT tx_ctrl;
+    PACK_STRUCT_END
 	unsigned short pkt_len;
 	PACK_STRUCT_BEGIN
 	struct {
