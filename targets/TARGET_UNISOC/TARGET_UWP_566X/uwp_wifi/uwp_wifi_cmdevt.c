@@ -4,17 +4,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-
 #include <string.h>
 
-#include "cmsis_os2.h"
 #include "mbed_retarget.h"
 #include "uwp_wifi_cmdevt.h"
+#include "uwp_netif.h"
+
+#define WIFI_LOG_DBG
+#define WIFI_DUMP
 #include "uwp_log.h"
 
 #define RECV_BUF_SIZE (128)
 #define ALL_2_4_GHZ_CHANNELS (0X3FFF)
 #define CHANNEL_2_4_GHZ_BIT(n) (1 << (n - 1))
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#endif
 
 extern struct wifi_priv uwp_wifi_ap_priv;
 
@@ -104,9 +110,8 @@ int wifi_cmd_load_ini(const u8_t *data, u32_t len, u8_t sec_num)
 
 	return 0;
 }
-#if 0
-int wifi_cmd_scan(struct wifi_device *wifi_dev,
-		struct wifi_drv_scan_params *params)
+
+int wifi_cmd_scan(struct wifi_device *wifi_dev, struct wifi_drv_scan_params *params)
 {
 	int ret;
 	int ssid_len = 0;
@@ -120,7 +125,7 @@ int wifi_cmd_scan(struct wifi_device *wifi_dev,
 
 	switch (band) {
 	case WIFI_BAND_2_4G:
-		cmd = k_malloc(cmd_len);
+		cmd = malloc(cmd_len);
 		if (!cmd) {
 			LOG_ERR("Cmd is null");
 			return -ENOMEM;
@@ -136,7 +141,7 @@ int wifi_cmd_scan(struct wifi_device *wifi_dev,
 		if (channel == 0) { /* All 5GHZ channel */
 			cmd_len +=  sizeof(channels_5g_scan_table);
 
-			cmd = k_malloc(cmd_len);
+			cmd = malloc(cmd_len);
 			if (!cmd) {
 				LOG_ERR("cmd is null");
 				return -ENOMEM;
@@ -149,7 +154,7 @@ int wifi_cmd_scan(struct wifi_device *wifi_dev,
 		} else { /* One channel */
 			cmd_len += 1;
 
-			cmd = k_malloc(cmd_len);
+			cmd = malloc(cmd_len);
 			if (!cmd) {
 				LOG_ERR("cmd is null");
 				return -ENOMEM;
@@ -166,7 +171,7 @@ int wifi_cmd_scan(struct wifi_device *wifi_dev,
 		if (channel == 0) { /* All channels */
 			cmd_len += sizeof(channels_5g_scan_table);
 
-			cmd = k_malloc(cmd_len);
+			cmd = malloc(cmd_len);
 			if (!cmd) {
 				LOG_ERR("cmd is null");
 				return -ENOMEM;
@@ -191,11 +196,11 @@ int wifi_cmd_scan(struct wifi_device *wifi_dev,
 			    cmd_len, NULL, NULL);
 	if (ret) {
 		LOG_ERR("Scan send cmd fail");
-		k_free(cmd);
+		free(cmd);
 		return ret;
 	}
 
-	k_free(cmd);
+	free(cmd);
 
 	return 0;
 }
@@ -246,7 +251,7 @@ int wifi_cmd_disconnect(struct wifi_device *wifi_dev)
 
 	return 0;
 }
-#endif
+
 int wifi_cmd_get_cp_info(struct wifi_priv *priv)
 {
 	struct cmd_get_cp_info cmd;
@@ -273,7 +278,7 @@ int wifi_cmd_get_cp_info(struct wifi_priv *priv)
 
 	return 0;
 }
-#if 0
+
 int wifi_cmd_open(struct wifi_device *wifi_dev)
 {
 	struct cmd_open cmd;
@@ -284,7 +289,7 @@ int wifi_cmd_open(struct wifi_device *wifi_dev)
 	memset(&cmd, 0, sizeof(cmd));
 	cmd.mode = wifi_dev->mode;
 	memcpy(cmd.mac, wifi_dev->mac, ETH_ALEN);
-
+    DUMP_DATA(&cmd, sizeof(cmd));
 	ret = wifi_cmd_send(WIFI_CMD_OPEN, (char *)&cmd, sizeof(cmd),
 			    NULL, NULL);
 	if (ret) {
@@ -295,7 +300,7 @@ int wifi_cmd_open(struct wifi_device *wifi_dev)
 
 	return 0;
 }
-
+#if 0
 int wifi_cmd_close(struct wifi_device *wifi_dev)
 {
 	struct cmd_stop cmd;
@@ -448,58 +453,53 @@ int wifi_cmd_set_ip(struct wifi_device *wifi_dev, u8_t *ip_addr, u8_t len)
 
 	return 0;
 }
-
+#endif
+// TODO: temporary for scan
+struct event_scan_result scan_ret[20];
+int scan_cnt;
+extern void *scan_done_sem;
 static int wifi_evt_scan_result(struct wifi_device *wifi_dev,
 		char *data, int len)
 {
-	struct event_scan_result *event =
-		(struct event_scan_result *)data;
-	struct wifi_drv_scan_result scan_result;
-
-	memset(&scan_result, 0, sizeof(scan_result));
+	struct event_scan_result *event = (struct event_scan_result *)data;
 
 	if (check_cmdevt_len(len, sizeof(struct event_scan_result))) {
 		return -EINVAL;
 	}
 
-	scan_result.security = WIFI_SECURITY_TYPE_NONE;
-	memcpy(scan_result.ssid, event->ssid, MAX_SSID_LEN);
-	scan_result.ssid_length = strlen(scan_result.ssid);
-	memcpy(scan_result.bssid, event->bssid, ETH_ALEN);
-
-	scan_result.channel = event->channel;
-	scan_result.rssi = event->rssi;
-
-	LOG_DBG("ssid: %s", event->ssid);
-
+    memcpy(&(scan_ret[0]), event, len);
+    scan_cnt ++;
+    LOG_DBG("scan_cnt:%d ssid: %s", scan_cnt, event->ssid);
+#if 0
 	if (wifi_dev->scan_result_cb) {
 		wifi_dev->scan_result_cb(wifi_dev->iface, 0, &scan_result);
 	} else {
 		LOG_WRN("No scan_result callback.");
 	}
 
-	k_yield();
-
+    osThreadYield();
+#endif
 	return 0;
 }
 
 static int wifi_evt_scan_done(struct wifi_device *wifi_dev, char *data, int len)
 {
-	struct event_scan_done *event =
-		(struct event_scan_done *)data;
+	struct event_scan_done *event = (struct event_scan_done *)data;
 
 	if (check_cmdevt_len(len, sizeof(struct event_scan_done))) {
 		return -EINVAL;
 	}
-
+#if 0
 	if (wifi_dev->scan_result_cb) {
 		wifi_dev->scan_result_cb(wifi_dev->iface, event->status, NULL);
 		wifi_dev->scan_result_cb = NULL;
 	} else {
 		LOG_WRN("No scan_result callback.");
 	}
-
-	return 0;
+#endif
+    k_sem_release(scan_done_sem);
+    LOG_DBG("STA SCAN DONE");
+    return 0;
 }
 
 static int wifi_evt_connect(struct wifi_device *wifi_dev, char *data, int len)
@@ -510,7 +510,12 @@ static int wifi_evt_connect(struct wifi_device *wifi_dev, char *data, int len)
 	if (check_cmdevt_len(len, sizeof(struct event_connect))) {
 		return -EINVAL;
 	}
-
+    LOG_DBG("%s",__func__);
+    if(!event->status){
+        LOG_DBG("connect successfully");
+        wifi_dev->connect_cb(1);
+    }
+#if 0
 	if (wifi_dev->connect_cb) {
 		wifi_dev->connect_cb(wifi_dev->iface, event->status);
 	} else {
@@ -518,7 +523,7 @@ static int wifi_evt_connect(struct wifi_device *wifi_dev, char *data, int len)
 	}
 
 	wifi_dev->connected = true;
-
+#endif
 	return 0;
 }
 
@@ -531,9 +536,9 @@ static int wifi_evt_disconnect(struct wifi_device *wifi_dev,
 	if (check_cmdevt_len(len, sizeof(struct event_disconnect))) {
 		return -EINVAL;
 	}
-
+    LOG_DBG("%s reason code:%d",__func__,event->reason_code);
 	if (wifi_dev->disconnect_cb) {
-		wifi_dev->disconnect_cb(wifi_dev->iface, event->reason_code);
+		wifi_dev->disconnect_cb(0);
 	} else {
 		LOG_WRN("No disconnect callback.");
 	}
@@ -542,8 +547,7 @@ static int wifi_evt_disconnect(struct wifi_device *wifi_dev,
 
 	return 0;
 }
-
-
+#if 0
 static int wifi_evt_new_sta(struct wifi_device *wifi_dev, char *data, int len)
 {
 	struct event_new_station *event =
@@ -600,24 +604,20 @@ int wifi_cmdevt_process(struct wifi_priv *priv, char *data, int len)
 	/* Receive Events */
 	switch (hdr->type) {
 	case WIFI_EVENT_SCAN_RESULT:
-		LOG_DBG("wifi_evt_scan_result");
-		/*wifi_evt_scan_result(&priv->wifi_dev[WIFI_DEV_STA],
-				hdr->data, len);*/
+		wifi_evt_scan_result(&priv->wifi_dev[WIFI_DEV_STA],
+				hdr->data, len);
 		break;
 	case WIFI_EVENT_SCAN_DONE:
-		LOG_DBG("wifi_evt_scan_done");
-		/*wifi_evt_scan_done(&priv->wifi_dev[WIFI_DEV_STA],
-				hdr->data, len);*/
+		wifi_evt_scan_done(&priv->wifi_dev[WIFI_DEV_STA],
+				hdr->data, len);
 		break;
 	case WIFI_EVENT_DISCONNECT:
-		LOG_DBG("wifi_evt_disconnect");
-		/*wifi_evt_disconnect(&priv->wifi_dev[WIFI_DEV_STA],
-				hdr->data, len);*/
+		wifi_evt_disconnect(&priv->wifi_dev[WIFI_DEV_STA],
+				hdr->data, len);
 		break;
 	case WIFI_EVENT_CONNECT:
-		LOG_DBG("wifi_evt_connect");
-		/*wifi_evt_connect(&priv->wifi_dev[WIFI_DEV_STA],
-				hdr->data, len);*/
+		wifi_evt_connect(&priv->wifi_dev[WIFI_DEV_STA],
+				hdr->data, len);
 		break;
 	case WIFI_EVENT_NEW_STATION:
 		LOG_DBG("wifi_evt_new_sta");
