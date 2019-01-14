@@ -18,6 +18,8 @@ static struct sblock_mgr sblocks[SIPC_ID_NR][SMSG_CH_NR-SMSG_CH_OFFSET];
 int sblock_get(u8_t dst, u8_t channel, struct sblock *blk, int timeout);
 int sblock_send(u8_t dst, u8_t channel, u8_t prio, struct sblock *blk);
 extern void sprd_wifi_irq_enable(void);
+
+// TODO: need porting
 static int sprd_bt_irq_init(void){
     return 0;
 }
