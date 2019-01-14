@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 #include "cmsis.h"
-
 #include "uwp_wifi_main.h"
-//extern void sleep_cal_lpo(unsigned int calms);
-struct wifi_priv uwp_wifi;
-
 
 /* This function is called after RAM initialization and before main. */
 void mbed_sdk_init(void){
@@ -27,13 +23,5 @@ void mbed_sdk_init(void){
 	uwp_cache_init();
 	intc_uwp_init();
 	aon_intc_uwp_init();
-}
-
-void mbed_main(void){
-	u32_t wrptr = 0x001eff0c;
-	u32_t rdptr = 0x001eff08;
-	sipc_init();
-    ipi_uwp_init();
-	uwp_init(&uwp_wifi, WIFI_MODE_STA);
 }
 
