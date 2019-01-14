@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "uwp_log.h"
 #include "mbed_retarget.h"
 #include "uwp_sblock.h"
 #include "uwp_sipc.h"
+
+//#define WIFI_LOG_DBG
+//#define WIFI_DUMP
+#include "uwp_log.h"
 
 int wifi_ipc_create_channel(int ch, void (*callback)(int ch))
 {
@@ -71,6 +74,12 @@ int wifi_ipc_send(int ch, int prio, void *data, int len, int offset)
 	}
 	LOG_DBG("IPC Channel %d Send data:", ch);
 	memcpy((char *)blk.addr + BLOCK_HEADROOM_SIZE + offset, data, len);
+
+#if 0  
+			u8_t *temp_addr = (u8_t *)blk.addr;
+			int temp_len = len+BLOCK_HEADROOM_SIZE+offset;
+			DUMP_DATA(temp_addr,temp_len);
+#endif
 
 	blk.length = len + offset;
 	ret = sblock_send(0, ch, prio, &blk);
