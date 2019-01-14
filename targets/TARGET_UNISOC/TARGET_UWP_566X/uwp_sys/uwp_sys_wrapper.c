@@ -110,3 +110,38 @@ void *k_thread_create(const char *name, void (*thread_fn)(void *arg), void *arg,
 int k_thread_terminate(void *tid){
     return 0;
 }
+
+void *k_msg_create(unsigned int queuesz){
+    osRtxMessageQueue_t *_obj_mem = malloc(sizeof(osRtxMessageQueue_t));
+    void *internal_data = malloc(queuesz*(sizeof(uwp_wifi_msg_t)+sizeof(osRtxMessage_t)));
+    if(_obj_mem==NULL || internal_data==NULL){
+        UWP_SYS_PRINT("sys malloc error\r\n");
+        return NULL;
+}
+    memset(_obj_mem, 0, sizeof(osRtxMessageQueue_t));
+    osMessageQueueAttr_t attr = { 0 };
+    attr.mq_mem = internal_data;
+    attr.mq_size = (queuesz*(sizeof(uwp_wifi_msg_t)+sizeof(osRtxMessage_t)));
+    attr.cb_mem = _obj_mem;
+    attr.cb_size = sizeof(osRtxMessageQueue_t);
+    osMessageQueueId_t id = osMessageQueueNew(queuesz, sizeof(uwp_wifi_msg_t), &attr);
+    if(id == NULL)
+        UWP_SYS_PRINT("create msg queue failed\r\n");
+    return id;
+}
+
+int k_msg_put(void *msgid, uwp_wifi_msg_t *msg, unsigned int ms){
+    osStatus_t ret;
+    ret = osMessageQueuePut(msgid, msg, 0, ms);
+    if(ret != osOK)
+        UWP_SYS_PRINT("msg put failed\r\n");
+    return (int)ret;
+}
+
+int k_msg_get(void *msgid, uwp_wifi_msg_t *msg, unsigned int ms){
+    osStatus_t ret;
+    ret = osMessageQueueGet(msgid, msg, NULL, ms);
+    if(ret != osOK)
+        UWP_SYS_PRINT("msg get failed\r\n");
+    return (int)ret;
+}

@@ -33,6 +33,19 @@ int k_mutex_delete(void *mutex);
 /* thread */
 void *k_thread_create(const char *name, void (*thread_fn)(void *arg), void *arg, void *stack_mem, uint32_t stack_size, int priority);
 int k_thread_terminate(void *tid);
+
+/* msg queue  */
+struct UWP_MSG_STRUCT{
+    unsigned int type;
+    unsigned int arg1;
+    unsigned int arg2;
+    unsigned int arg3;
+};
+typedef struct UWP_MSG_STRUCT* uwp_wifi_msg_t;
+void *k_msg_create(unsigned int queuesz);
+int k_msg_put(void *msgid, uwp_wifi_msg_t *msg, unsigned int ms);
+int k_msg_get(void *msgid, uwp_wifi_msg_t *msg, unsigned int ms);
+
 /* sys list   */
 
 /* for zephyr */
