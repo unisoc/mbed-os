@@ -2,7 +2,7 @@
 
 #define UWP_IRAM_BASE         (0x00100000) /* RAM   size ??        */
 #define UWP_DRAM_BASE         (0x00180000)
-#define UWP_BOOT_FLASH_BASE   (0x02000000) /* 128k  for bootloader */
+#define UWP_BOOT_FLASH_BASE   (0x02000000) /* 256k  for bootloader */
 #define UWP_APP_FLASH_BASE    (0x02040000) /* 512k  for app        */
 #define UWP_MODEM_FLASH_BASE  (0x020c0000) /* 640k  for modem      */
 #define UWP_USER_FLASH_BASE   (0x02200000) /* 1280k for user data  */
