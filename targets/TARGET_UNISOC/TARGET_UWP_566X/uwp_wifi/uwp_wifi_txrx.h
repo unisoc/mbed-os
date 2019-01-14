@@ -91,7 +91,7 @@ struct rx_msdu_desc {
 	 */
 	u32_t curr_buff_base_addr_l;
 	/* WORD9 */
-	__packed union {
+	union {
 		/* base buffer addr of
 		 * this msdu high 8 bit
 		 */
@@ -369,4 +369,4 @@ int wifi_release_rx_buf(void);
 }
 #endif
 
-#endif /* __WIFI_TXRX_H__ */
+#endif /* UWP_WIFI_TXRX_H */

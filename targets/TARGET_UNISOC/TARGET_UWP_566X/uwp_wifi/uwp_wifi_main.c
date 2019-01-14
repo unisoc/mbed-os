@@ -10,8 +10,13 @@
 #include "uwp_wifi_main.h"
 #include "uwp_wifi_rf.h"
 #include "uwp_wifi_cmdevt.h"
+#include "uwp_sys_wrapper.h"
+#include "uwp_wifi_drv.h"
+#include "uwp_wifi_txrx.h"
 
-
+//#define WIFI_LOG_DBG
+//#define WIFI_DUMP
+#include "uwp_log.h"
 
 /*
  * We do not need <socket/include/socket.h>
@@ -32,6 +37,8 @@
 	((struct wifi_priv *)(dev)->driver_data)
 
 static struct wifi_priv uwp_wifi_priv_data;
+static struct wifi_priv uwp_wifi_dev;
+static bool cp_initialized = false;
 
 static int wifi_rf_init(void)
 {
@@ -530,8 +537,6 @@ int uwp_init(struct wifi_priv *wifi_priv, UWP_WIFI_MODE_T wifi_mode)
 	}
 	
 	if (!priv->initialized) {
-		//wifi_cmdevt_init();
-		//wifi_txrx_init(priv);
 		ret = uwp_mcu_init();
 		if (ret) {
 			LOG_ERR("Firmware download failed %i.",
@@ -581,3 +586,179 @@ NET_DEVICE_INIT(uwp_sta, CONFIG_WIFI_STA_DRV_NAME,
 		ETHERNET_L2, NET_L2_GET_CTX_TYPE(ETHERNET_L2),
 		MTU);
 #endif
+
+static int wifi_tx_fill_msdu_dscr(struct wifi_device *wifi_dev,
+                void *pkt, void *pkt_len, u8_t type, u8_t offset)
+{
+    u32_t addr = 0;
+    struct tx_msdu_dscr *dscr = NULL;
+    dscr = (struct tx_msdu_dscr *)pkt;
+
+    memset(dscr, 0x00, sizeof(struct tx_msdu_dscr));
+    addr = (u32_t)dscr;
+    SPRD_AP_TO_CP_ADDR(addr);
+    dscr->next_buf_addr_low = addr;
+    dscr->next_buf_addr_high = 0x0;
+
+    dscr->tx_ctrl.checksum_offload = 0;
+    dscr->common.type =
+        (type == SPRDWL_TYPE_CMD ? SPRDWL_TYPE_CMD : SPRDWL_TYPE_DATA);
+    dscr->common.direction_ind = TRANS_FOR_TX_PATH;
+    dscr->common.buffer_type = 0;
+
+    if (wifi_dev->mode == WIFI_MODE_STA) {
+        dscr->common.interface = WIFI_DEV_STA;
+    } else if (wifi_dev->mode == WIFI_MODE_AP) {
+        dscr->common.interface = WIFI_DEV_AP;
+    }
+
+    dscr->pkt_len = pkt_len;
+    dscr->offset = 11;
+    /* TODO */
+    dscr->tx_ctrl.sw_rate = (type == SPRDWL_TYPE_DATA_SPECIAL ? 1 : 0);
+    dscr->tx_ctrl.wds = 0;
+    /*TBD*/ dscr->tx_ctrl.swq_flag = 0;
+    /*TBD*/ dscr->tx_ctrl.rsvd = 0;
+    /*TBD*/ dscr->tx_ctrl.pcie_mh_readcomp = 1;
+    dscr->buffer_info.msdu_tid = 0;
+    dscr->buffer_info.mac_data_offset = 0;
+    dscr->buffer_info.sta_lut_idx = 0;
+    dscr->buffer_info.encrypt_bypass = 0;
+    dscr->buffer_info.ap_buf_flag = 1;
+    dscr->tx_ctrl.checksum_offload = 0;
+    dscr->tx_ctrl.checksum_type = 0;
+    dscr->tcp_udp_header_offset = 0;
+
+    //DUMP_DATA(dscr,sizeof(struct tx_msdu_dscr));
+    //DUMP_DATA(dscr+sizeof(struct tx_msdu_dscr), 14);
+    return 0;
+}
+
+/* for uwp_cp_init uwp_mgmt_open 
+ * if repeated operate
+ * return correct value
+ */
+int uwp_cp_init(void){ 
+    int ret = -1;
+    if(cp_initialized){
+        LOG_DBG("cp is already runing");
+        return 0;
+    }
+    sipc_init();
+    ipi_uwp_init();
+    ret = uwp_init(&uwp_wifi_dev, WIFI_MODE_STA);
+    if(ret == 0)
+        cp_initialized = true;
+    return ret;
+}
+
+extern int impl_empty_buf(int num);
+int uwp_mgmt_open(void){
+    int ret = -1;
+    int i;
+    if(uwp_wifi_dev.wifi_dev[0].opened == true){
+        LOG_DBG("WIFI STA OPENED");
+        return 0;
+    }
+    ret = wifi_cmd_open(&(uwp_wifi_dev.wifi_dev[0]));
+    if(ret == 0){
+        for(i = 0; i < 10; i ++){
+            ret = impl_empty_buf(1);
+            if(ret != 0)
+                break;
+        }
+    }
+    uwp_wifi_dev.wifi_dev[0].opened = true;
+    return ret;
+}
+// TODO: msg is reasonable
+void *scan_done_sem = NULL;
+extern int scan_cnt;
+int uwp_mgmt_scan(uint8_t band, uint8_t channel)
+{
+    int ret = -1;
+    struct wifi_drv_scan_params para;
+    para.band = band;
+    para.channel = channel;
+    if(scan_done_sem == NULL)
+        scan_done_sem = k_sem_create(1, 0);
+    ret = wifi_cmd_scan(&(uwp_wifi_dev.wifi_dev[0]), &para);
+    if(ret != 0)
+        return ret;
+    else
+        k_sem_acquire(scan_done_sem, 10000);
+    return scan_cnt;
+}
+
+int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel)
+{
+    struct wifi_drv_connect_params para;
+    memset(&para, 0, sizeof(para));
+    para.channel = channel;
+    para.ssid_length = strlen(ssid);
+    para.psk_length = strlen(password);
+    para.ssid = ssid;
+    para.psk = password;
+    LOG_DBG("ssid:%s psk:%s",para.ssid,para.psk);
+    if (uwp_wifi_dev.wifi_dev[0].connected) {
+        LOG_WRN("Connect again in connected.");
+    }
+
+    uwp_netif_cb_register(&(uwp_wifi_dev.wifi_dev[0]));
+
+    return wifi_cmd_connect(&(uwp_wifi_dev.wifi_dev[0]), &para);
+}
+
+int uwp_mgmt_tx(uint8_t *pkt, uint32_t pkt_len)
+{
+    u8_t *data_ptr;
+    u16_t data_len;
+    u16_t total_len;
+    u32_t addr;
+    u16_t max_len;
+    u8_t *debug_buf;
+    int ret;
+ 
+    wifi_tx_fill_msdu_dscr(&(uwp_wifi_dev.wifi_dev[0]), pkt, pkt_len, SPRDWL_TYPE_DATA, 0);
+
+    data_ptr = (u32_t)pkt;
+    /* FIXME Save pkt addr before payload. */
+    //uwp_save_addr_before_payload(addr, (void *)pkt);
+
+    SPRD_AP_TO_CP_ADDR(data_ptr);
+
+    max_len = MTU + sizeof(struct tx_msdu_dscr) + 14 /* link layer header length */;
+
+    if (pkt_len > max_len) {
+        LOG_ERR("Exceed max length %d data_len %d", max_len, pkt_len);
+            return -EINVAL;
+    }
+
+    debug_buf = (u8_t *)(data_ptr + sizeof(struct tx_msdu_dscr));
+    LOG_DBG("DATA OUT:%02x:%02x:%02x:%02x:%02x:%02x <-- %02x:%02x:%02x:%02x:%02x:%02x addr:%p len:%d", 
+            debug_buf[0],debug_buf[1],debug_buf[2],debug_buf[3],debug_buf[4],debug_buf[5],
+                debug_buf[6],debug_buf[7],debug_buf[8],debug_buf[9],debug_buf[10],debug_buf[11],
+                    pkt,pkt_len);
+
+    wifi_tx_data((void *)data_ptr, pkt_len);
+
+    return 0;
+}
+
+int uwp_mgmt_getmac(uint8_t *addr){
+    memcpy(addr,uwp_wifi_dev.wifi_dev[0].mac,6);
+    DUMP_DATA(addr,6);
+    return 0;
+}
+
+int uwp_mgmt_disconnect(void)
+{
+    struct wifi_device *wifi_dev = &(uwp_wifi_dev.wifi_dev[0]);
+
+    if(!wifi_dev->connected) {
+        LOG_WRN("Disconnect again in disconnected.");
+    }
+
+    return wifi_cmd_disconnect(wifi_dev);
+}
+

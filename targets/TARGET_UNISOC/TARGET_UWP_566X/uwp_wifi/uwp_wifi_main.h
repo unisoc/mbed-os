@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef MBED_WIFI_MAIN_H
-#define MBED_WIFI_MAIN_H
+#ifndef MBED_UWP_WIFI_MAIN_H
+#define MBED_UWP_WIFI_MAIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,13 +14,13 @@ extern "C" {
 #include <stdbool.h>
 
 #include "uwp_type.h"
-#include "uwp_log.h"
-#include "uwp_sys_wrapper.h"
+#include "uwp_wifi_drv.h"
 
 //#define WIFI_MODE_NONE (0)
 //#define WIFI_MODE_STA (1)
 typedef enum{
-    WIFI_MODE_STA = 0,
+    WIFI_MODE_NONE = 0,
+    WIFI_MODE_STA,
 	WIFI_MODE_AP
 }UWP_WIFI_MODE_T;
 
@@ -36,6 +36,7 @@ typedef enum{
 #define ETH_ALEN (6)
 #define IPV4_LEN (4)
 
+// TODO: need porting
 struct wifi_device {
 	/* bool connecting; */
 	bool connected;
@@ -43,11 +44,11 @@ struct wifi_device {
 	u8_t mode;
 	u8_t mac[ETH_ALEN];
 	u8_t ipv4_addr[IPV4_LEN];
-	//scan_result_cb_t scan_result_cb;
-	//connect_cb_t connect_cb;
-	//disconnect_cb_t disconnect_cb;
+	scan_result_cb_t scan_result_cb;
+	connect_cb_t connect_cb;
+	disconnect_cb_t disconnect_cb;
 	//new_station_t new_station_cb;
-	//struct net_if *iface;
+	void *iface;
 };
 
 struct wifi_priv {
@@ -75,16 +76,21 @@ static inline u32_t uwp_get_addr_from_payload(u32_t payload)
 /* extern struct adapter wifi_pAd; */
 
 
-struct wifi_device *get_wifi_dev_by_dev(struct device *dev);
+//struct wifi_device *get_wifi_dev_by_dev(struct device *dev);
 /* int wifi_ifnet_sta_init(struct adapter *pAd); */
 /* int wifi_ifnet_ap_init(struct adapter *pAd); */
 /* struct netif *wifi_ifnet_get_interface(struct adapter *pAd,int ctx_id); */
 
-int uwp_init(struct wifi_priv *wifi_priv, UWP_WIFI_MODE_T wifi_mode);
-
+int uwp_cp_init(void);
+int uwp_mgmt_open(void);
+int uwp_mgmt_scan(uint8_t band, uint8_t channel);
+int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel);
+int uwp_mgmt_tx(uint8_t *pkt, uint32_t pkt_len);
+int uwp_mgmt_getmac(uint8_t * addr);
+int uwp_mgmt_disconnect(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __WIFI_MAIN_H__ */
+#endif /* UWP_WIFI_MAIN_H */
