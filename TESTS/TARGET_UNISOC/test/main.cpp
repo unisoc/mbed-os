@@ -15,10 +15,22 @@
  * limitations under the License.
  */
 #include "stdio.h"
+#include "uwpWiFiInterface.h"
 
 int main(void)
 {
-    printf("hehehehehehe\r\n");
+	UWPWiFiInterface wifi;
+    WiFiAccessPoint res;
+    printf("simple wifi test ...\r\n");
+	wifi.init();
+    wifi.scan(&res,1);
+    wifi.connect("TP-LINK_E304", NULL, NSAPI_SECURITY_NONE,8);
+    printf("ip address:%s\r\n",wifi.get_ip_address());
+    osDelay(10000);
+    wifi.disconnect();
+    osDelay(10000);
+    wifi.connect("TP-LINK_E304", NULL, NSAPI_SECURITY_NONE,8);
+    printf("ip address:%s\r\n",wifi.get_ip_address());
     while(1);
     return 0;
 }

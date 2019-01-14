@@ -59,6 +59,12 @@ extern "C" {
 #define DUMP_DATA(buff, len)
 #endif
 
+#define WIFI_ASSERT(expression,fmt,...) do {\
+            if(!(expression)){\
+                mbed_error_printf("fatal err:%s   ",__func__);\
+                mbed_error_printf(fmt"\r\n",##__VA_ARGS__);\
+            }\
+       } while(0)
 
 #define printk mbed_error_printf
 

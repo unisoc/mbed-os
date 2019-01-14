@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "UWP_5661.h"
-#include "uwp_log.h"
 #include "uwp_sipc.h"
 #include "uwp_type.h"
 
@@ -329,110 +328,108 @@ int wifi_irq_init(void)
 }
 #endif
 
+//#define WIFI_LOG_INF
+//#define WIFI_LOG_DBG
+#include "uwp_log.h"
+
 // TODO: parameter arg mean ???
 static void wifi_aon_irq_handler(int ch, void *arg)
 {
-	struct smsg msg;
-	s32_t irq = (s32_t)AON_IRQn;
+    struct smsg msg;
+    s32_t irq = (s32_t)AON_IRQn;
 
-	LOG_INF("wifi irq aon %d\n", irq);
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, (irq + 50));
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, (irq + 50));
+    smsg_send_irq(SIPC_ID_AP, &msg);
 }
 
-// TODO: parameter arg mean ???
 static void wifi_mac_irq_handler(void)
 {
 
-	struct smsg msg;
-	s32_t irq = (s32_t)MAC_IRQn;
-
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
+    struct smsg msg;
+    s32_t irq = (s32_t)MAC_IRQn;
+    NVIC_DisableIRQ(MAC_IRQn);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(MAC_IRQn);
 }
 
 static void wifi_cap_irq_handler(void)
 {
 
-	struct smsg msg;
-	s32_t irq = (s32_t)REQ_WIFI_CAP_IRQn;
-
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
+    struct smsg msg;
+    s32_t irq = (s32_t)REQ_WIFI_CAP_IRQn;
+    NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
 }
 
 static void wifi_dpd_irq_handler(void)
 {
-
-	struct smsg msg;
-	s32_t irq = (s32_t)DPD_IRQn;
-
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
+    struct smsg msg;
+    s32_t irq = (s32_t)DPD_IRQn;
+    NVIC_DisableIRQ(DPD_IRQn);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(DPD_IRQn);
 }
 
 static void wifi_comtmr_irq_handler(void)
 {
-
-	struct smsg msg;
-	s32_t irq = (s32_t)COMTMR_IRQn;
-
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
+    struct smsg msg;
+    s32_t irq = (s32_t)COMTMR_IRQn;
+    NVIC_DisableIRQ(COMTMR_IRQn);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(COMTMR_IRQn);
 }
-
-
 
 void wifi_irq_init(void)
 {
     NVIC_DisableIRQ(MAC_IRQn);
-	NVIC_SetVector(MAC_IRQn,wifi_mac_irq_handler);
-	NVIC_SetPriority(MAC_IRQn,0x1FUL);
+    NVIC_SetVector(MAC_IRQn,wifi_mac_irq_handler);
+    NVIC_SetPriority(MAC_IRQn,0x1FUL);
 
     NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
-	NVIC_SetVector(REQ_WIFI_CAP_IRQn,wifi_cap_irq_handler);
-	NVIC_SetPriority(REQ_WIFI_CAP_IRQn,0x1FUL);
+    NVIC_SetVector(REQ_WIFI_CAP_IRQn,wifi_cap_irq_handler);
+    NVIC_SetPriority(REQ_WIFI_CAP_IRQn,0x1FUL);
 
     NVIC_DisableIRQ(DPD_IRQn);
-	NVIC_SetVector(DPD_IRQn,wifi_dpd_irq_handler);
-	NVIC_SetPriority(DPD_IRQn,0x1FUL);
+    NVIC_SetVector(DPD_IRQn,wifi_dpd_irq_handler);
+    NVIC_SetPriority(DPD_IRQn,0x1FUL);
 
+    LOG_INF("init irq num:%d",COMTMR_IRQn);
     NVIC_DisableIRQ(COMTMR_IRQn);
-	NVIC_SetVector(COMTMR_IRQn,wifi_comtmr_irq_handler);
-	NVIC_SetPriority(COMTMR_IRQn,0x1FUL);
+    NVIC_SetVector(COMTMR_IRQn,wifi_comtmr_irq_handler);
+    NVIC_SetPriority(COMTMR_IRQn,0x1FUL);
+    /* COMTMR open request before init so enable here */
+    NVIC_EnableIRQ(COMTMR_IRQn);
 
-	uwp_aon_intc_set_irq_callback(AON_INT_IRQ_REQ_BB_TS,
-		wifi_aon_irq_handler, (void *)AON_INT_IRQ_REQ_BB_TS);
-
+    uwp_aon_intc_set_irq_callback(AON_INT_IRQ_REQ_BB_TS,
+        wifi_aon_irq_handler, (void *)AON_INT_IRQ_REQ_BB_TS);
 }
 
 void sprd_wifi_irq_enable_num(u32_t num)
 {
-	LOG_INF("wifi irq enable %d\n", num);
+    LOG_INF("wifi irq enable %d\n", num);
 
-	switch (num) {
-	case MAC_IRQn:
-		NVIC_EnableIRQ(MAC_IRQn);
-	break;
-	case COMTMR_IRQn:
-		NVIC_EnableIRQ(COMTMR_IRQn);
-	break;
-	case REQ_WIFI_CAP_IRQn:
-		NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
-	break;
-	case DPD_IRQn:
-		NVIC_EnableIRQ(DPD_IRQn);
-	break;
-	default:
-		LOG_INF("wifi irq enable error num %d\n", num);
-	break;
-	}
-
+    switch (num) {
+    case MAC_IRQn:
+        NVIC_EnableIRQ(MAC_IRQn);
+        break;
+    case COMTMR_IRQn:
+        NVIC_EnableIRQ(COMTMR_IRQn);
+        break;
+    case REQ_WIFI_CAP_IRQn:
+        NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
+        break;
+    case DPD_IRQn:
+        NVIC_EnableIRQ(DPD_IRQn);
+        break;
+    default:
+        LOG_INF("wifi irq enable error num %d\n", num);
+        break;
+    }
 }
-
 

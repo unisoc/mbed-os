@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef MBED_WIFI_CMDEVT_H
-#define MBED_WIFI_CMDEVT_H
+#ifndef MBED_UWP_WIFI_CMDEVT_H
+#define MBED_UWP_WIFI_CMDEVT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -227,8 +227,7 @@ PACK_STRUCT_END
 int wifi_cmd_get_cp_info(struct wifi_priv *priv);
 int wifi_cmd_open(struct wifi_device *wifi_dev);
 int wifi_cmd_close(struct wifi_device *wifi_dev);
-int wifi_cmd_scan(struct wifi_device *wifi_dev,
-		struct wifi_drv_scan_params *params);
+int wifi_cmd_scan(struct wifi_device *wifi_dev, struct wifi_drv_scan_params *params);
 int wifi_cmd_connect(struct wifi_device *wifi_dev,
 			    struct wifi_drv_connect_params *params);
 int wifi_cmd_disconnect(struct wifi_device *wifi_dev);
@@ -250,4 +249,4 @@ int wifi_cmdevt_init(void);
 }
 #endif
 
-#endif /* __WIFI_CMDEVT_H__ */
+#endif /* UWP_WIFI_CMDEVT_H */

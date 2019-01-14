@@ -1,0 +1,7 @@
+{
+    "target_overrides": {
+        "UWP_566X": {
+            "target.features_add": ["LWIP"]
+        }
+    }
+}

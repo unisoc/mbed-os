@@ -11,6 +11,12 @@
 #include "uwp_wifi_ipc.h"
 #include "uwp_wifi_cmdevt.h"
 #include "uwp_sipc.h"
+#include "uwp_sys_wrapper.h"
+#include "mbed_retarget.h"
+
+//#define WIFI_LOG_DBG
+//#define WIFI_DUMP
+#include "uwp_log.h"
 
 #define RX_BUF_SIZE (2000)
 #define TXRX_STACK_SIZE (1024)
@@ -27,6 +33,7 @@ static void *event_sem = NULL;
 static void *rx_buf_mutex = NULL;
 static u8_t rx_buf[RX_BUF_SIZE];
 static wifi_slist_t rx_buf_list;
+extern void *packet_rx_queue;
 
 #if 0
 K_THREAD_STACK_MEMBER(txrx_stack, TXRX_STACK_SIZE);
@@ -35,139 +42,126 @@ static void *event_sem = NULL;
 static void *rx_buf_mutex = NULL;
 static u8_t rx_buf[RX_BUF_SIZE];
 static wifi_slist_t rx_buf_list;
-
-
+#endif
+extern int impl_empty_buf(int num);
 int wifi_rx_complete_handle(struct wifi_priv *priv, void *data, int len)
 {
-	struct rxc *rx_complete_buf = (struct rxc *)data;
-	struct rxc_ddr_addr_trans_t *rxc_addr = &rx_complete_buf->rxc_addr;
-	struct rx_msdu_desc *rx_msdu = NULL;
-	struct net_if *iface;
-	u32_t payload = 0;
-	u32_t buf;
+    struct rxc *rx_complete_buf = (struct rxc *)data;
+    struct rxc_ddr_addr_trans_t *rxc_addr = &rx_complete_buf->rxc_addr;
+    struct rx_msdu_desc *rx_msdu = NULL;
+    u32_t payload = 0;
+    u8_t *debug_buf;
 
-	struct net_pkt *rx_pkt;
-	struct net_buf *pkt_buf;
-	int ctx_id = 0;
-	int i = 0;
-	u32_t data_len;
+    int ctx_id = 0;
+    int i = 0;
+    u32_t data_len;
+    int ret;
 
-	rx_pkt = net_pkt_get_reserve_rx(0, K_NO_WAIT);
-	if (!rx_pkt) {
-		LOG_ERR("Could not allocate rx packet.");
-		return -ENOMEM;
-	}
+    for (i = 0; i < rxc_addr->num; i++) {
+        memcpy(&payload, rxc_addr->addr_addr[i], 4);
+        WIFI_ASSERT(payload > SPRD_CP_DRAM_BEGIN
+            && payload < SPRD_CP_DRAM_END,
+            "Invalid buffer address: %p", (void *)payload);
 
-	for (i = 0; i < rxc_addr->num; i++) {
-		memcpy(&payload, rxc_addr->addr_addr[i], 4);
-		__ASSERT(payload > SPRD_CP_DRAM_BEGIN
-				&& payload < SPRD_CP_DRAM_END,
-			 "Invalid buffer address: %p", (void *)payload);
+        SPRD_CP_TO_AP_ADDR(payload);
 
-		SPRD_CP_TO_AP_ADDR(payload);
-		buf = uwp_get_addr_from_payload(payload);
-		__ASSERT(buf > SPRD_AP_DRAM_BEGIN
-				&& buf < SPRD_AP_DRAM_END,
-			 "Invalid pkt_buf address: %p", (void *)buf);
+        WIFI_ASSERT(payload > SPRD_AP_DRAM_BEGIN
+            && payload < SPRD_AP_DRAM_END,
+            "Invalid pkt_buf address: %p", (void *)payload);
 
-		pkt_buf = (struct net_buf *)buf;
+        rx_msdu = (struct rx_msdu_desc *)(payload + sizeof(struct rx_mh_desc));
+        ctx_id = rx_msdu->ctx_id;
+        data_len = rx_msdu->msdu_len + rx_msdu->msdu_offset;
+        WIFI_ASSERT(data_len > 0 && data_len < 1800,
+            "Invalid data len: %d", data_len);
 
-		k_mutex_lock(&rx_buf_mutex, K_FOREVER);
-		wifi_buf_slist_remove(&rx_buf_list, &pkt_buf->node);
-		k_mutex_unlock(&rx_buf_mutex);
+        uwp_wifi_msg_t msg = malloc(sizeof(struct UWP_MSG_STRUCT));
+        msg->type = 0;
+        msg->arg1 = (uint32_t)(payload + rx_msdu->msdu_offset);
+        msg->arg2 = rx_msdu->msdu_len;
+        msg->arg3 = rx_msdu->msdu_offset;
 
-		rx_msdu =
-			(struct rx_msdu_desc *)(pkt_buf->data +
-						sizeof(struct rx_mh_desc));
-		ctx_id = rx_msdu->ctx_id;
-		data_len = rx_msdu->msdu_len + rx_msdu->msdu_offset;
-		__ASSERT(data_len > 0 && data_len < CONFIG_NET_BUF_DATA_SIZE,
-			 "Invalid data len: %d", data_len);
+        debug_buf = (u8_t *) msg->arg1;
+        LOG_DBG("DATA IN:%02x:%02x:%02x:%02x:%02x:%02x <-- %02x:%02x:%02x:%02x:%02x:%02x addr:%p len:%d offset:%d", 
+            debug_buf[0],debug_buf[1],debug_buf[2],debug_buf[3],debug_buf[4],debug_buf[5],
+                debug_buf[6],debug_buf[7],debug_buf[8],debug_buf[9],debug_buf[10],debug_buf[11],
+                    msg->arg1,msg->arg2,msg->arg3);
+#if 0
+        u8_t temp_tplink[7];
+        temp_tplink[0] = 0x34;
+        temp_tplink[1] = 0x96;
+        temp_tplink[2] = 0x72;
+        temp_tplink[3] = 0xed;
+        temp_tplink[4] = 0xe3;
+        temp_tplink[5] = 0x04;
+        if(memcmp(temp_tplink,&(debug_buf[6]),6) == 0)
+            DUMP_DATA(msg->arg1,msg->arg2);
+#endif
+        k_msg_put(packet_rx_queue, &msg, osWaitForever);
+    }
 
-		net_buf_add(pkt_buf, data_len);
-		net_buf_pull(pkt_buf, rx_msdu->msdu_offset);
 
-		net_pkt_frag_add(rx_pkt, pkt_buf);
-	}
+    /* Allocate new empty buffer to cp. */
+    LOG_DBG("notify cp:%d\r\n",i);
+    ret = impl_empty_buf(i);
 
-	iface = priv->wifi_dev[rx_complete_buf->common.interface].iface;
-
-	if (!iface) {
-		LOG_ERR("Iface null.");
-		net_pkt_unref(rx_pkt);
-	} else {
-		if (net_recv_data(iface, rx_pkt) < 0) {
-			LOG_ERR("pkt %p not received by L2 stack.", rx_pkt);
-			net_pkt_unref(rx_pkt);
-		}
-	}
-
-	/* Allocate new empty buffer to cp. */
-	wifi_tx_empty_buf(i);
-
-	return 0;
+    return ret;
 }
 
 int wifi_tx_complete_handle(void *data, int len)
 {
-	struct txc *txc_complete_buf = (struct txc *)data;
-	struct txc_addr_buff *txc_addr = &txc_complete_buf->txc_addr;
-	u16_t payload_num;
-	u32_t payload_addr;
-	u32_t tx_pkt;
-	int i;
+    struct txc *txc_complete_buf = (struct txc *)data;
+    struct txc_addr_buff *txc_addr = &txc_complete_buf->txc_addr;
+    u16_t payload_num;
+    u32_t payload_addr;
+    int i;
 
-	payload_num = txc_addr->number;
+    payload_num = txc_addr->number;
+    LOG_DBG("payload num:%d\r\n",payload_num);
+    for (i = 0; i < payload_num; i++) {
+        /* We use only 4 byte addr. */
+        memcpy(&payload_addr,
+            txc_addr->data + (i * SPRDWL_PHYS_LEN), 4);
 
-	for (i = 0; i < payload_num; i++) {
-		/* We use only 4 byte addr. */
-		memcpy(&payload_addr,
-				txc_addr->data + (i * SPRDWL_PHYS_LEN), 4);
+        payload_addr -= sizeof(struct tx_msdu_dscr);
+        WIFI_ASSERT(payload_addr > SPRD_CP_DRAM_BEGIN
+            && payload_addr < SPRD_CP_DRAM_END,
+            "Invalid buffer address: %p", (void *)payload_addr);
 
-		payload_addr -= sizeof(struct tx_msdu_dscr);
-		__ASSERT(payload_addr > SPRD_CP_DRAM_BEGIN
-				&& payload_addr < SPRD_CP_DRAM_END,
-			 "Invalid buffer address: %p", (void *)payload_addr);
+        SPRD_CP_TO_AP_ADDR(payload_addr);
 
-		SPRD_CP_TO_AP_ADDR(payload_addr);
-		tx_pkt = uwp_get_addr_from_payload(payload_addr);
-		__ASSERT(tx_pkt > SPRD_AP_DRAM_BEGIN
-				&& tx_pkt < SPRD_AP_DRAM_END,
-			 "Invalid pkt address: %p", (void *)tx_pkt);
+        WIFI_ASSERT(payload_addr > SPRD_AP_DRAM_BEGIN
+            && payload_addr < SPRD_AP_DRAM_END,
+            "Invalid pkt address: %p", (void *)payload_addr);
 
-		net_pkt_unref((struct net_pkt *)tx_pkt);
-	}
+        LOG_DBG("free TXBUFF:%p\r\n",payload_addr);
+        free(payload_addr);
+    }
 
-	return 0;
-}
-
-int wifi_tx_cmd(void *data, int len)
-{
-	return wifi_ipc_send(SMSG_CH_WIFI_CTRL, QUEUE_PRIO_HIGH,
-			    data, len, WIFI_CTRL_MSG_OFFSET);
+    return 0;
 }
 
 int wifi_data_process(struct wifi_priv *priv, char *data, int len)
 {
-	struct sprdwl_common_hdr *common_hdr = (struct sprdwl_common_hdr *)data;
+    struct sprdwl_common_hdr *common_hdr = (struct sprdwl_common_hdr *)data;
 
-	switch (common_hdr->type) {
-	case SPRDWL_TYPE_DATA_SPECIAL:
-		if (common_hdr->direction_ind) { /* Rx data. */
-			wifi_rx_complete_handle(priv, data, len);
-		} else { /* Tx complete. */
-			wifi_tx_complete_handle(data, len);
-		}
-		break;
-	case SPRDWL_TYPE_DATA:
-	case SPRDWL_TYPE_DATA_HIGH_SPEED:
-		break;
-	default:
-		LOG_ERR("Unknown type :%d\n", common_hdr->type);
-	}
-	return 0;
+    switch (common_hdr->type) {
+    case SPRDWL_TYPE_DATA_SPECIAL:
+        if (common_hdr->direction_ind) { /* Rx data. */
+            wifi_rx_complete_handle(priv, data, len);
+        } else { /* Tx complete. */
+            wifi_tx_complete_handle(data, len);
+        }
+        break;
+    case SPRDWL_TYPE_DATA:
+    case SPRDWL_TYPE_DATA_HIGH_SPEED:
+        break;
+    default:
+        LOG_ERR("Unknown type :%d\n", common_hdr->type);
+    }
+    return 0;
 }
-
+#if 0
 static void txrx_thread(void *p1)
 {
 	int ret;
@@ -354,131 +348,170 @@ int wifi_release_rx_buf(void)
 }
 #endif
 
+int impl_empty_buf(int num){
+    static int i = 0;
+    struct rx_empty_buff buf;
+    int ret;
+    u32_t data_ptr;
+
+    memset(&buf, 0, sizeof(buf));
+
+    /* Reserve a data frag to receive the frame */
+    void *pkt_buf = malloc(1600);
+    if (!pkt_buf) {
+        LOG_ERR("Could not allocate rx buf %d.", i);
+        return -ENOMEM;
+    }
+    LOG_DBG("RXBUF%d:%p", i, pkt_buf);
+
+    data_ptr = (u32_t)pkt_buf;
+
+    SPRD_AP_TO_CP_ADDR(data_ptr);
+    memcpy(&(buf.addr[0][0]), &data_ptr, 4);
+
+    buf.type = EMPTY_DDR_BUFF;
+    buf.num = 1;
+    buf.common.type = SPRDWL_TYPE_DATA_SPECIAL;
+    buf.common.direction_ind = TRANS_FOR_RX_PATH;
+
+    ret = wifi_ipc_send(SMSG_CH_WIFI_DATA_NOR, QUEUE_PRIO_NORMAL,
+            (void *)&buf,
+            1 * SPRDWL_PHYS_LEN + 3,
+            WIFI_DATA_NOR_MSG_OFFSET);
+    if (ret < 0) {
+        LOG_ERR("IPC send fail %d", ret);
+        return ret;
+    }
+
+    i++;
+
+    return 0;   
+}
+
 static void wifi_rx_event(int ch)
 {
-	if (ch == SMSG_CH_WIFI_CTRL) {
-		k_sem_release(event_sem);
-	}
+    if (ch == SMSG_CH_WIFI_CTRL) {
+        k_sem_release(event_sem);
+    }
 }
 
 static void wifi_rx_data(int ch)
 {
-	if (ch != SMSG_CH_WIFI_DATA_NOR) {
-		LOG_ERR("Invalid data channel: %d.", ch);
-	}
+    if (ch != SMSG_CH_WIFI_DATA_NOR) {
+        LOG_ERR("Invalid data channel: %d.", ch);
+    }
 
-	k_sem_release(event_sem);
+    k_sem_release(event_sem);
 }
 
 int wifi_tx_cmd(void *data, int len)
 {
-	return wifi_ipc_send(SMSG_CH_WIFI_CTRL, QUEUE_PRIO_HIGH,
-			    data, len, WIFI_CTRL_MSG_OFFSET);
+    return wifi_ipc_send(SMSG_CH_WIFI_CTRL, QUEUE_PRIO_HIGH,
+                data, len, WIFI_CTRL_MSG_OFFSET);
 }
 
 int wifi_tx_data(void *data, int len)
 {
-	//ARG_UNUSED(len);
+    //ARG_UNUSED(len);
 
-	int ret;
-	struct hw_addr_buff_t addr_buf;
+    int ret;
+    struct hw_addr_buff_t addr_buf;
 
-	memset(&addr_buf, 0, sizeof(struct hw_addr_buff_t));
-	addr_buf.common.interface = 0;
-	addr_buf.common.type = SPRDWL_TYPE_DATA_SPECIAL;
-	addr_buf.common.direction_ind = 0;
-	addr_buf.common.buffer_type = 1;
-	addr_buf.number = 1;
-	addr_buf.offset = 7;
-	addr_buf.tx_ctrl.pcie_mh_readcomp = 1;
+    memset(&addr_buf, 0, sizeof(struct hw_addr_buff_t));
+    addr_buf.common.interface = 0;
+    addr_buf.common.type = SPRDWL_TYPE_DATA_SPECIAL;
+    addr_buf.common.direction_ind = 0;
+    addr_buf.common.buffer_type = 1;
+    addr_buf.number = 1;
+    addr_buf.offset = 7;
+    addr_buf.tx_ctrl.pcie_mh_readcomp = 1;
 
-	memset(addr_buf.pcie_addr[0], 0, SPRDWL_PHYS_LEN);
-	memcpy(addr_buf.pcie_addr[0], &data, 4);  /* Copy addr to addr buf. */
+    memset(addr_buf.pcie_addr[0], 0, SPRDWL_PHYS_LEN);
+    memcpy(addr_buf.pcie_addr[0], &data, 4);  /* Copy addr to addr buf. */
 
-	ret = wifi_ipc_send(SMSG_CH_WIFI_DATA_NOR, QUEUE_PRIO_NORMAL,
-			    (void *)&addr_buf,
-			    1 * SPRDWL_PHYS_LEN + sizeof(struct hw_addr_buff_t),
-			    WIFI_DATA_NOR_MSG_OFFSET);
-	if (ret < 0) {
-		LOG_ERR("IPC send fail %d", ret);
-		return ret;
-	}
+    ret = wifi_ipc_send(SMSG_CH_WIFI_DATA_NOR, QUEUE_PRIO_NORMAL,
+                (void *)&addr_buf,
+                1 * SPRDWL_PHYS_LEN + sizeof(struct hw_addr_buff_t),
+                WIFI_DATA_NOR_MSG_OFFSET);
+    if (ret < 0) {
+        LOG_ERR("IPC send fail %d", ret);
+        return ret;
+    }
 
-	return 0;
+    return 0;
 }
 
 static void txrx_thread(const char*p1)
 {
-	int ret;
-	struct wifi_priv *priv = (struct wifi_priv *)p1;
-	u8_t *addr = rx_buf;
-	int len;
+    int ret;
+    struct wifi_priv *priv = (struct wifi_priv *)p1;
+    u8_t *addr = rx_buf;
+    int len;
 
-	while (1) {
+    while (1) {
 
-		k_sem_acquire(event_sem, K_FOREVER);
+        k_sem_acquire(event_sem, K_FOREVER);
 
-		while (1) {
-			memset(addr, 0, RX_BUF_SIZE);
-			ret = wifi_ipc_recv(SMSG_CH_WIFI_CTRL, addr, &len, 0);
-			if (ret == 0) {
-				LOG_DBG("Receive cmd/evt %p len %i",
-						addr, len);
-				DUMP_DATA(addr,len);
+        while (1) {
+            memset(addr, 0, RX_BUF_SIZE);
+            ret = wifi_ipc_recv(SMSG_CH_WIFI_CTRL, addr, &len, 0);
+            if (ret == 0) {
+                LOG_DBG("Receive cmd/evt %p len %i",
+                        addr, len);
+                //DUMP_DATA(addr,len);
 
-				wifi_cmdevt_process(priv, addr, len);
-			} else {
-				break;
-			}
-		}
+                wifi_cmdevt_process(priv, addr, len);
+            } else {
+                break;
+            }
+        }
 
-		while (1) {
-			ret = wifi_ipc_recv(SMSG_CH_WIFI_DATA_NOR,
-					addr, &len, 0);
-			if (ret == 0) {
-				LOG_DBG("Receive data %p len %i",
-						addr, len);
-				//wifi_data_process(priv, addr, len);
-			} else {
-				break;
-			}
-		}
-
-	}
+        while (1) {
+            ret = wifi_ipc_recv(SMSG_CH_WIFI_DATA_NOR,
+                    addr, &len, 0);
+            if (ret == 0) {
+                LOG_DBG("Receive data %p len %i",
+                        addr, len);
+                //DUMP_DATA(addr,len);
+                wifi_data_process(priv, addr, len);
+            } else {
+                break;
+            }
+        }
+    }
 }
-
 
 int wifi_txrx_init(struct wifi_priv *priv)
 {
-	int ret = 0;
+    int ret = 0;
 
-	event_sem = k_sem_create(1, 0);
-	rx_buf_mutex = k_mutex_create();
+    event_sem = k_sem_create(1, 0);
+    rx_buf_mutex = k_mutex_create();
 
-	wifi_buf_slist_init(&rx_buf_list);
+    wifi_buf_slist_init(&rx_buf_list);
 
-	ret = wifi_ipc_create_channel(SMSG_CH_WIFI_CTRL,
-				      wifi_rx_event);
-	if (ret < 0) {
-		LOG_ERR("Create wifi control channel failed.");
-		return ret;
-	}
+    ret = wifi_ipc_create_channel(SMSG_CH_WIFI_CTRL,
+                      wifi_rx_event);
+    if (ret < 0) {
+        LOG_ERR("Create wifi control channel failed.");
+        return ret;
+    }
 
-	ret = wifi_ipc_create_channel(SMSG_CH_WIFI_DATA_NOR,
-				      wifi_rx_data);
-	if (ret < 0) {
-		LOG_ERR("Create wifi data channel failed.");
-		return ret;
-	}
+    ret = wifi_ipc_create_channel(SMSG_CH_WIFI_DATA_NOR,
+                      wifi_rx_data);
+    if (ret < 0) {
+        LOG_ERR("Create wifi data channel failed.");
+        return ret;
+    }
 
-	ret = wifi_ipc_create_channel(SMSG_CH_WIFI_DATA_SPEC,
-				      wifi_rx_data);
-	if (ret < 0) {
-		LOG_ERR("Create wifi data channel failed.");
-		return ret;
-	}
+    ret = wifi_ipc_create_channel(SMSG_CH_WIFI_DATA_SPEC,
+                      wifi_rx_data);
+    if (ret < 0) {
+        LOG_ERR("Create wifi data channel failed.");
+        return ret;
+    }
 
-	k_thread_create("txrx_thread",txrx_thread,NULL,NULL,TXRX_STACK_SIZE,osPriorityNormal);
+    k_thread_create("txrx_thread",txrx_thread,(void *)priv,NULL,TXRX_STACK_SIZE * 2,osPriorityNormal);
 
 /*
 	k_thread_create(&txrx_thread_data, txrx_stack,
@@ -488,5 +521,5 @@ int wifi_txrx_init(struct wifi_priv *priv)
 			K_PRIO_COOP(7),
 			0, K_NO_WAIT);
 */
-	return 0;
+    return 0;
 }

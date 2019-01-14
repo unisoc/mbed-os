@@ -7427,15 +7427,18 @@
     "UNISOC_UWP": {
         "inherits": ["Target"],
         "core": "Cortex-M4",
-        "extra_labels": ["UNISOC","FLASH_CMSIS_ALGO"],
+        "extra_labels": ["UNISOC","FLASH_CMSIS_ALGO","UNISOC_EMAC"],
         "default_lib": null,
         "public": false,
         "supported_toolchains": ["ARM","GCC_ARM","IAR"],
         "macros": ["TWO_RAM_REGIONS"],
-        "device_has": ["FLASH","SERIAL","INTERRUPTIN"],
+        "device_has": ["FLASH","SERIAL","INTERRUPTIN","EMAC"],
         "release_versions": ["5"]
     },
     "UWP_566X": {
-        "inherits": ["UNISOC_UWP"]
+        "inherits": ["UNISOC_UWP"],
+        "overrides": {
+            "network-default-interface-type" : "WIFI"
+        }
     }
 }

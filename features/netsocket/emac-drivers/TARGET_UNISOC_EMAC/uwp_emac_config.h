@@ -1,5 +1,4 @@
-/* mbed Microcontroller Library
- * Copyright (c) 2006-2018 ARM Limited
+/* Copyright (c) 2017 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "cmsis.h"
-#include "uwp_wifi_main.h"
 
-/* This function is called after RAM initialization and before main. */
-void mbed_sdk_init(void){
-	struct spi_flash_struct flash_test;
-	uwp_flash_init(&flash_test);
-	uwp_cache_init();
-	intc_uwp_init();
-	aon_intc_uwp_init();
-}
+#ifndef MBED_UWP_EMAC_CONFIG_H
+#define MBED_UWP_EMAC_CONFIG_H
 
+#define THREAD_STACKSIZE              512
+
+#endif // #define STM32XX_EMAC_CONFIG_H__

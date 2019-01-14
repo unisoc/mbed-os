@@ -50,9 +50,8 @@ extern "C" {
     #define ALIGNED(n)  __attribute__((aligned (n)))
 #endif
 
-
-typedef uint32_t   u32_t;
-typedef int32_t   s32_t;
+typedef uint32_t       u32_t;
+typedef int32_t        s32_t;
 typedef unsigned short u16_t;
 typedef signed   short s16_t;
 typedef unsigned char  u8_t;
