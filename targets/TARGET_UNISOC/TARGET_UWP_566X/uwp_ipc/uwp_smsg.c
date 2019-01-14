@@ -10,9 +10,11 @@
 #include "uwp_sipc.h"
 #include "uwp_sipc_priv.h"
 #include "uwp_sys_wrapper.h"
-#include "uwp_log.h"
 #include "uwp_hal_base.h"
 #include "uwp_ipi.h"
+
+//#define WIFI_LOG_DBG
+#include "uwp_log.h"
 
 #define SMSG_STACK_SIZE		(2048)
 //struct k_thread smsg_thread;
@@ -53,9 +55,11 @@ static struct smsg_ipc smsg_ipcs[SIPC_ID_NR];
 
 // TODO:need porting
 void wakeup_smsg_task_all(void *sem){
+    printf("%s\r\n",__func__);
     return;
 }
 void sprd_wifi_irq_disable_num(u32_t num){
+    printf("%s\r\n",__func__);
     return;
 }
 /*
