@@ -29,8 +29,8 @@ void uwp_intc_set_irq_callback(int channel,
 		uwp_intc_callback_t cb, void *arg)
 {
 	if (intc_uwp_dev_data.irq[channel].cb != NULL) {
-		printk("IRQ %d callback has been registered.\n", channel);
-		return;
+        LOG_WRN("IRQ %d callback has been registered.\n", channel);
+        return;
 	}
 
 	intc_uwp_dev_data.irq[channel].cb = cb;
@@ -47,8 +47,8 @@ void uwp_intc_set_fiq_callback(int channel,
 		uwp_intc_callback_t cb, void *arg)
 {
 	if (intc_uwp_dev_data.fiq[channel].cb != NULL) {
-		printk("FIQ %d callback has been registered.\n", channel);
-		return;
+        LOG_WRN("FIQ %d callback has been registered.\n", channel);
+        return;
 	}
 
 	intc_uwp_dev_data.fiq[channel].cb = cb;
@@ -66,8 +66,8 @@ void uwp_aon_intc_set_irq_callback(int channel,
 {
 
 	if (aon_intc_uwp_dev_data.irq[channel].cb != NULL) {
-		printk("IRQ %d callback has been registered.\n", channel);
-		return;
+        LOG_WRN("IRQ %d callback has been registered.\n", channel);
+        return;
 	}
 
 	aon_intc_uwp_dev_data.irq[channel].cb = cb;
