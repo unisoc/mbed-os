@@ -3,7 +3,7 @@
 #include "mbed_shared_queues.h"
 #include "netsocket/nsapi_types.h"
 #include "lwip/arch.h"
-#include "Debug.h"
+#include "debug.h"
 #include "uwp_emac.h"
 #include "uwp_wifi_main.h"
 #include "uwp_sipc.h"
