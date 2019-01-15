@@ -58,10 +58,7 @@ void wakeup_smsg_task_all(void *sem){
     printf("%s\r\n",__func__);
     return;
 }
-void sprd_wifi_irq_disable_num(u32_t num){
-    printf("%s\r\n",__func__);
-    return;
-}
+
 /*
 static inline void uwp_ipi_irq_trigger(void){
     return;

@@ -10,8 +10,11 @@
 #include "uwp_sipc.h"
 #include "uwp_type.h"
 
-#if 0
+//#define WIFI_LOG_INF
+//#define WIFI_LOG_DBG
+#include "uwp_log.h"
 
+#if 0
 #if defined(CONFIG_BT_CTLR_WORKER_PRIO)
 #define RADIO_TICKER_USER_ID_WORKER_PRIO CONFIG_BT_CTLR_WORKER_PRIO
 #else
@@ -22,6 +25,7 @@
 #define RADIO_TICKER_USER_ID_JOB_PRIO CONFIG_BT_CTLR_JOB_PRIO
 #else
 #define RADIO_TICKER_USER_ID_JOB_PRIO 0
+#endif
 #endif
 
 #define CTL_INTC_BASE            0x40000000
@@ -89,35 +93,35 @@
 void clear_bt_int(int irq_num)
 {
 	switch (irq_num) {
-	case NVIC_BT_MASKED_TIM_INTR0:
+	case BT_MASKED_TIM_INTR0_IRQn:
 		CEVA_IP_int_clear(TIM_INTRO_CLR); break;
-	case NVIC_BT_MASKED_TIM_INTR1:
+	case BT_MASKED_TIM_INTR1_IRQn:
 		CEVA_IP_int_clear(TIM_INTR1_CLR); break;
-	case NVIC_BT_MASKED_TIM_INTR2:
+	case BT_MASKED_TIM_INTR2_IRQn:
 		CEVA_IP_int_clear(TIM_INTR2_CLR); break;
-	case NVIC_BT_MASKED_TIM_INTR3:
+	case BT_MASKED_TIM_INTR3_IRQn:
 		CEVA_IP_int_clear(TIM_INTR3_CLR); break;
-	case NVIC_BT_MASKED_AUX_TMR_INTR:
+	case BT_MASKED_AUX_TMR_INTR_IRQn:
 		CEVA_IP_int_clear(AUX_TMR_INTR); break;
-	case NVIC_BT_MASKED_PKA_INTR:
+	case BT_MASKED_PKA_INTR_IRQn:
 		CEVA_IP_int_MASK(PKA_INTR_MASK); break;
-	case NVIC_BT_MASKED_SYNC_DET_INTR:
+	case BT_MASKED_SYNC_DET_INTR_IRQn:
 		CEVA_IP_int_MASK(SYNC_DET_INTR_MASK); break;
-	case NVIC_BT_MASKED_PKD_RX_HDR:
+	case BT_MASKED_PKD_RX_HDR_IRQn:
 		CEVA_IP_int_MASK(PKD_RX_HDR_INTR_MASK); break;
-	case NVIC_BT_MASKED_PKD_INTR:
+	case BT_MASKED_PKD_INTR_IRQn:
 		CEVA_IP_int_MASK(PKD_INTR_MASK); break;
-	case NVIC_BT_MASKED_PAGE_TIMEOUT_INTR:
+	case BT_MASKED_PAGE_TIMEOUT_INTR_IRQn:
 		CEVA_IP_int_MASK(PKD_NO_PKD_INTR_MASK); break;
-	case NVIC_BT_ACCELERATOR_INTR0:
+	case BT_ACCELERATOR_INTR0_IRQn:
 		HW_DEC_int_clear(ATOR_INTR0); break;
-	case NVIC_BT_ACCELERATOR_INTR1:
+	case BT_ACCELERATOR_INTR1_IRQn:
 		HW_DEC_int_clear(ATOR_INTR1); break;
-	case NVIC_BT_ACCELERATOR_INTR2:
+	case BT_ACCELERATOR_INTR2_IRQn:
 		HW_DEC_int_clear(ATOR_INTR2); break;
-	case NVIC_BT_ACCELERATOR_INTR3:
+	case BT_ACCELERATOR_INTR3_IRQn:
 		HW_DEC_int_clear_sts; break;
-	case NVIC_BT_ACCELERATOR_INTR4:
+	case BT_ACCELERATOR_INTR4_IRQn:
 		HW_DEC_int1_clear_sts; break;
 
 	default:
@@ -126,211 +130,61 @@ void clear_bt_int(int irq_num)
 
 }
 
+
 void sprd_bt_irq_enable(void)
 {
-	irq_enable(NVIC_BT_MASKED_PAGE_TIMEOUT_INTR);
-	irq_enable(NVIC_BT_MASKED_SYNC_DET_INTR);
-	irq_enable(NVIC_BT_MASKED_PKD_RX_HDR);
-	irq_enable(NVIC_BT_MASKED_TIM_INTR0);
-	irq_enable(NVIC_BT_MASKED_TIM_INTR1);
-	irq_enable(NVIC_BT_MASKED_TIM_INTR2);
-	irq_enable(NVIC_BT_MASKED_TIM_INTR3);
-	irq_enable(NVIC_BT_MASKED_PKD_INTR);
-	irq_enable(NVIC_BT_MASKED_PKA_INTR);
-	irq_enable(NVIC_BT_MASKED_AUX_TMR_INTR);
-	irq_enable(NVIC_BT_ACCELERATOR_INTR0);
-	irq_enable(NVIC_BT_ACCELERATOR_INTR1);
-	irq_enable(NVIC_BT_ACCELERATOR_INTR2);
-	irq_enable(NVIC_BT_ACCELERATOR_INTR3);
-	irq_enable(NVIC_BT_ACCELERATOR_INTR4);
+	NVIC_EnableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_SYNC_DET_INTR_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_PKD_RX_HDR_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_TIM_INTR0_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_TIM_INTR1_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_TIM_INTR2_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_TIM_INTR3_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_PKD_INTR_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_PKA_INTR_IRQn);
+	NVIC_EnableIRQ(BT_MASKED_AUX_TMR_INTR_IRQn);
+	NVIC_EnableIRQ(BT_ACCELERATOR_INTR0_IRQn);
+	NVIC_EnableIRQ(BT_ACCELERATOR_INTR1_IRQn);
+	NVIC_EnableIRQ(BT_ACCELERATOR_INTR2_IRQn);
+	NVIC_EnableIRQ(BT_ACCELERATOR_INTR3_IRQn);
+	NVIC_EnableIRQ(BT_ACCELERATOR_INTR4_IRQn);
 }
 
 void sprd_bt_irq_disable(void)
 {
-	irq_disable(NVIC_BT_MASKED_PAGE_TIMEOUT_INTR);
-	irq_disable(NVIC_BT_MASKED_SYNC_DET_INTR);
-	irq_disable(NVIC_BT_MASKED_PKD_RX_HDR);
-	irq_disable(NVIC_BT_MASKED_TIM_INTR0);
-	irq_disable(NVIC_BT_MASKED_TIM_INTR1);
-	irq_disable(NVIC_BT_MASKED_TIM_INTR2);
-	irq_disable(NVIC_BT_MASKED_TIM_INTR3);
-	irq_disable(NVIC_BT_MASKED_PKD_INTR);
-	irq_disable(NVIC_BT_MASKED_PKA_INTR);
-	irq_disable(NVIC_BT_MASKED_AUX_TMR_INTR);
-	irq_disable(NVIC_BT_ACCELERATOR_INTR0);
-	irq_disable(NVIC_BT_ACCELERATOR_INTR1);
-	irq_disable(NVIC_BT_ACCELERATOR_INTR2);
-	irq_disable(NVIC_BT_ACCELERATOR_INTR3);
-	irq_disable(NVIC_BT_ACCELERATOR_INTR4);
-
-}
-
-static int bt_irq_handler(void *arg)
-{
-	struct smsg msg;
-	s32_t irq = (s32_t)arg;
-
-	clear_bt_int(irq);
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-	return 0;
-}
-
-int sprd_bt_irq_init(void)
-{
-	IRQ_CONNECT(NVIC_BT_MASKED_PAGE_TIMEOUT_INTR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_PAGE_TIMEOUT_INTR, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_SYNC_DET_INTR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_SYNC_DET_INTR, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_PKD_RX_HDR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_PKD_RX_HDR, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_TIM_INTR0,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_TIM_INTR0, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_TIM_INTR1,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_TIM_INTR1, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_TIM_INTR2,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_TIM_INTR2, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_TIM_INTR3,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_TIM_INTR3, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_PKD_INTR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_PKD_INTR, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_PKA_INTR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_PKA_INTR, 0);
-	IRQ_CONNECT(NVIC_BT_MASKED_AUX_TMR_INTR,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_MASKED_AUX_TMR_INTR, 0);
-	IRQ_CONNECT(NVIC_BT_ACCELERATOR_INTR0,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_ACCELERATOR_INTR0, 0);
-	IRQ_CONNECT(NVIC_BT_ACCELERATOR_INTR1,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_ACCELERATOR_INTR1, 0);
-	IRQ_CONNECT(NVIC_BT_ACCELERATOR_INTR2,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_ACCELERATOR_INTR2, 0);
-	IRQ_CONNECT(NVIC_BT_ACCELERATOR_INTR3,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_ACCELERATOR_INTR3, 0);
-	IRQ_CONNECT(NVIC_BT_ACCELERATOR_INTR4,
-		RADIO_TICKER_USER_ID_WORKER_PRIO, bt_irq_handler,
-		NVIC_BT_ACCELERATOR_INTR4, 0);
-
-	sprd_bt_irq_enable();
-
-	return 0;
+	NVIC_DisableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_SYNC_DET_INTR_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_PKD_RX_HDR_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_TIM_INTR0_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_TIM_INTR1_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_TIM_INTR2_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_TIM_INTR3_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_PKD_INTR_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_PKA_INTR_IRQn);
+	NVIC_DisableIRQ(BT_MASKED_AUX_TMR_INTR_IRQn);
+	NVIC_DisableIRQ(BT_ACCELERATOR_INTR0_IRQn);
+	NVIC_DisableIRQ(BT_ACCELERATOR_INTR1_IRQn);
+	NVIC_DisableIRQ(BT_ACCELERATOR_INTR2_IRQn);
+	NVIC_DisableIRQ(BT_ACCELERATOR_INTR3_IRQn);
+	NVIC_DisableIRQ(BT_ACCELERATOR_INTR4_IRQn);
 }
 
 /*wifi irq register enable request dis*/
 void sprd_wifi_irq_enable(void)
 {
-	irq_enable(NVIC_INT_MAC);
-	irq_enable(NVIC_INT_REQ_WIFI_CAP);
-	irq_enable(NVIC_INT_DPD);
-	irq_enable(NVIC_INT_REQ_COM_TMR);
+	NVIC_EnableIRQ(MAC_IRQn);
+	NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
+	NVIC_EnableIRQ(DPD_IRQn);
+	NVIC_EnableIRQ(COMTMR_IRQn);
 }
 
 void sprd_wifi_irq_disable(void)
 {
-	irq_disable(NVIC_INT_MAC);
-	irq_disable(NVIC_INT_REQ_WIFI_CAP);
-	irq_disable(NVIC_INT_DPD);
-	irq_disable(NVIC_INT_REQ_COM_TMR);
+	NVIC_DisableIRQ(MAC_IRQn);
+	NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
+	NVIC_DisableIRQ(DPD_IRQn);
+	NVIC_DisableIRQ(COMTMR_IRQn);
 }
-
-void sprd_wifi_irq_enable_num(u32_t num)
-{
-	LOG_INF("wifi irq enable %d\n", num);
-
-	switch (num) {
-	case NVIC_INT_MAC:
-		irq_enable(NVIC_INT_MAC);
-	break;
-	case NVIC_INT_REQ_COM_TMR:
-		irq_enable(NVIC_INT_REQ_COM_TMR);
-	break;
-	case NVIC_INT_REQ_WIFI_CAP:
-		irq_enable(NVIC_INT_REQ_WIFI_CAP);
-	break;
-	case NVIC_INT_DPD:
-		irq_enable(NVIC_INT_DPD);
-	break;
-	default:
-		LOG_INF("wifi irq enable error num %d\n", num);
-	break;
-	}
-
-}
-void sprd_wifi_irq_disable_num(u32_t num)
-{
-	LOG_INF("wifi irq enable %d\n", num);
-	switch (num) {
-	case NVIC_INT_MAC:
-		irq_disable(NVIC_INT_MAC);
-	break;
-	case NVIC_INT_REQ_COM_TMR:
-		irq_disable(NVIC_INT_REQ_COM_TMR);
-	break;
-	case NVIC_INT_REQ_WIFI_CAP:
-		irq_disable(NVIC_INT_REQ_WIFI_CAP);
-	break;
-	case NVIC_INT_DPD:
-		irq_disable(NVIC_INT_DPD);
-	break;
-	default:
-		LOG_INF("wifi irq disable error num %d\n", num);
-	break;
-	}
-
-}
-static void wifi_aon_irq_handler(int ch, void *arg)
-{
-	struct smsg msg;
-	s32_t irq = (s32_t)arg;
-
-	LOG_INF("wifi irq aon %d\n", irq);
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, (irq + 50));
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
-}
-static int wifi_int_irq_handler(void *arg)
-{
-	struct smsg msg;
-	s32_t irq = (s32_t)arg;
-
-	smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-	smsg_send_irq(SIPC_ID_AP, &msg);
-
-	return 0;
-}
-
-int wifi_irq_init(void)
-{
-	IRQ_CONNECT(NVIC_INT_MAC, 5, wifi_int_irq_handler,
-		NVIC_INT_MAC, 0);
-	IRQ_CONNECT(NVIC_INT_REQ_WIFI_CAP, 5, wifi_int_irq_handler,
-		NVIC_INT_REQ_WIFI_CAP, 0);
-	IRQ_CONNECT(NVIC_INT_DPD, 5, wifi_int_irq_handler,
-		NVIC_INT_DPD, 0);
-	IRQ_CONNECT(NVIC_INT_REQ_COM_TMR, 5, wifi_int_irq_handler,
-		NVIC_INT_REQ_COM_TMR, 0);
-	uwp_aon_intc_set_irq_callback(AON_INT_IRQ_REQ_BB_TS,
-		wifi_aon_irq_handler, (void *)AON_INT_IRQ_REQ_BB_TS);
-	return 0;
-}
-#endif
-
-//#define WIFI_LOG_INF
-//#define WIFI_LOG_DBG
-#include "uwp_log.h"
 
 // TODO: parameter arg mean ???
 static void wifi_aon_irq_handler(int ch, void *arg)
@@ -432,4 +286,275 @@ void sprd_wifi_irq_enable_num(u32_t num)
         break;
     }
 }
+
+void sprd_wifi_irq_disable_num(u32_t num)
+{
+	LOG_INF("wifi irq disable %d\n", num);
+	switch (num) {
+	case MAC_IRQn:
+		NVIC_DisableIRQ(MAC_IRQn);
+	break;
+	case COMTMR_IRQn:
+		NVIC_DisableIRQ(COMTMR_IRQn);
+	break;
+	case REQ_WIFI_CAP_IRQn:
+		NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
+	break;
+	case DPD_IRQn:
+		NVIC_DisableIRQ(DPD_IRQn);
+	break;
+	default:
+		LOG_INF("wifi irq disable error num %d\n", num);
+	break;
+	}
+
+}
+
+static void bt_masked_page_timeout_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_PAGE_TIMEOUT_INTR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
+}
+
+static void bt_masked_sync_det_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_SYNC_DET_INTR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_SYNC_DET_INTR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_SYNC_DET_INTR_IRQn);
+}
+
+static void bt_masked_pkd_rx_hdr_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_PKD_RX_HDR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_PKD_RX_HDR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_PKD_RX_HDR_IRQn);
+}
+
+static void bt_masked_tim_intr0_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_TIM_INTR0_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR0_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_TIM_INTR0_IRQn);
+}
+
+static void bt_masked_tim_intr1_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_TIM_INTR1_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR1_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_TIM_INTR1_IRQn);
+}
+
+static void bt_masked_tim_intr2_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_TIM_INTR2_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR2_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_TIM_INTR2_IRQn);
+}
+
+static void bt_masked_tim_intr3_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_TIM_INTR3_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR3_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_TIM_INTR3_IRQn);
+}
+
+static void bt_masked_pkd_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_PKD_INTR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_PKD_INTR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_PKD_INTR_IRQn);
+}
+
+static void bt_masked_pka_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_PKA_INTR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_PKA_INTR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_PKA_INTR_IRQn);
+}
+
+static void bt_masked_aux_tmr_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_MASKED_AUX_TMR_INTR_IRQn;
+
+    NVIC_DisableIRQ(BT_MASKED_AUX_TMR_INTR_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_MASKED_AUX_TMR_INTR_IRQn);
+}
+
+static void bt_masked_accelerator_intr0_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_ACCELERATOR_INTR0_IRQn;
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR0_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_ACCELERATOR_INTR0_IRQn);
+}
+
+static void bt_masked_accelerator_intr1_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_ACCELERATOR_INTR1_IRQn;
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR1_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_ACCELERATOR_INTR1_IRQn);
+}
+
+static void bt_masked_accelerator_intr2_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_ACCELERATOR_INTR2_IRQn;
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR2_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_ACCELERATOR_INTR2_IRQn);
+}
+
+static void bt_masked_accelerator_intr3_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_ACCELERATOR_INTR3_IRQn;
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR3_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_ACCELERATOR_INTR3_IRQn);
+}
+
+static void bt_masked_accelerator_intr4_handler(void){
+    struct smsg msg;
+    s32_t irq = (s32_t)BT_ACCELERATOR_INTR4_IRQn;
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR4_IRQn);
+    clear_bt_int(irq);
+    LOG_DBG("%s\r\n",__func__);
+    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
+    smsg_send_irq(SIPC_ID_AP, &msg);
+    NVIC_EnableIRQ(BT_ACCELERATOR_INTR4_IRQn);
+}
+
+int sprd_bt_irq_init(void)
+{
+    NVIC_DisableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
+    NVIC_SetVector(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn,bt_masked_page_timeout_handler);
+    NVIC_SetPriority(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_SYNC_DET_INTR_IRQn);
+    NVIC_SetVector(BT_MASKED_SYNC_DET_INTR_IRQn,bt_masked_sync_det_handler);
+    NVIC_SetPriority(BT_MASKED_SYNC_DET_INTR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_PKD_RX_HDR_IRQn);
+    NVIC_SetVector(BT_MASKED_PKD_RX_HDR_IRQn,bt_masked_pkd_rx_hdr_handler);
+    NVIC_SetPriority(BT_MASKED_PKD_RX_HDR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR0_IRQn);
+    NVIC_SetVector(BT_MASKED_TIM_INTR0_IRQn,bt_masked_tim_intr0_handler);
+    NVIC_SetPriority(BT_MASKED_TIM_INTR0_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR1_IRQn);
+    NVIC_SetVector(BT_MASKED_TIM_INTR1_IRQn,bt_masked_tim_intr1_handler);
+    NVIC_SetPriority(BT_MASKED_TIM_INTR1_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR2_IRQn);
+    NVIC_SetVector(BT_MASKED_TIM_INTR2_IRQn,bt_masked_tim_intr2_handler);
+    NVIC_SetPriority(BT_MASKED_TIM_INTR2_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_TIM_INTR3_IRQn);
+    NVIC_SetVector(BT_MASKED_TIM_INTR3_IRQn,bt_masked_tim_intr3_handler);
+    NVIC_SetPriority(BT_MASKED_TIM_INTR3_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_PKD_INTR_IRQn);
+    NVIC_SetVector(BT_MASKED_PKD_INTR_IRQn,bt_masked_pkd_handler);
+    NVIC_SetPriority(BT_MASKED_PKD_INTR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_PKA_INTR_IRQn);
+    NVIC_SetVector(BT_MASKED_PKA_INTR_IRQn,bt_masked_pka_handler);
+    NVIC_SetPriority(BT_MASKED_PKA_INTR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_MASKED_AUX_TMR_INTR_IRQn);
+    NVIC_SetVector(BT_MASKED_AUX_TMR_INTR_IRQn,bt_masked_aux_tmr_handler);
+    NVIC_SetPriority(BT_MASKED_AUX_TMR_INTR_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR0_IRQn);
+    NVIC_SetVector(BT_ACCELERATOR_INTR0_IRQn,bt_masked_accelerator_intr0_handler);
+    NVIC_SetPriority(BT_ACCELERATOR_INTR0_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR1_IRQn);
+    NVIC_SetVector(BT_ACCELERATOR_INTR1_IRQn,bt_masked_accelerator_intr1_handler);
+    NVIC_SetPriority(BT_ACCELERATOR_INTR1_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR2_IRQn);
+    NVIC_SetVector(BT_ACCELERATOR_INTR2_IRQn,bt_masked_accelerator_intr2_handler);
+    NVIC_SetPriority(BT_ACCELERATOR_INTR2_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR3_IRQn);
+    NVIC_SetVector(BT_ACCELERATOR_INTR3_IRQn,bt_masked_accelerator_intr3_handler);
+    NVIC_SetPriority(BT_ACCELERATOR_INTR3_IRQn,0x1FUL);
+
+    NVIC_DisableIRQ(BT_ACCELERATOR_INTR4_IRQn);
+    NVIC_SetVector(BT_ACCELERATOR_INTR4_IRQn,bt_masked_accelerator_intr4_handler);
+    NVIC_SetPriority(BT_ACCELERATOR_INTR4_IRQn,0x1FUL);
+
+	sprd_bt_irq_enable();
+
+	return 0;
+}
+
 
