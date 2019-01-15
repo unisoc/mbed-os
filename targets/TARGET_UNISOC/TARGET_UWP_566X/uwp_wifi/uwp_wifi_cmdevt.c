@@ -10,8 +10,8 @@
 #include "uwp_wifi_cmdevt.h"
 #include "uwp_netif.h"
 
-#define WIFI_LOG_DBG
-#define WIFI_DUMP
+//#define WIFI_LOG_DBG
+//#define WIFI_DUMP
 #include "uwp_log.h"
 
 #define RECV_BUF_SIZE (128)
@@ -23,11 +23,15 @@
 #endif
 
 extern struct wifi_priv uwp_wifi_ap_priv;
+extern void *g_wifi_mgmt_queue;
+extern struct list_head g_scan_list;
+
 
 static unsigned char recv_buf[RECV_BUF_SIZE];
 static unsigned int recv_len;
 static unsigned int seq = 1;
 static void *cmd_sem = NULL;
+static int scan_ap_cnt = 0;
 
 static const u16_t CRC_table[] = {
 	0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00,
@@ -458,6 +462,7 @@ int wifi_cmd_set_ip(struct wifi_device *wifi_dev, u8_t *ip_addr, u8_t len)
 struct event_scan_result scan_ret[20];
 int scan_cnt;
 extern void *scan_done_sem;
+
 static int wifi_evt_scan_result(struct wifi_device *wifi_dev,
 		char *data, int len)
 {
@@ -467,18 +472,18 @@ static int wifi_evt_scan_result(struct wifi_device *wifi_dev,
 		return -EINVAL;
 	}
 
-    memcpy(&(scan_ret[0]), event, len);
-    scan_cnt ++;
-    LOG_DBG("scan_cnt:%d ssid: %s", scan_cnt, event->ssid);
-#if 0
-	if (wifi_dev->scan_result_cb) {
-		wifi_dev->scan_result_cb(wifi_dev->iface, 0, &scan_result);
-	} else {
-		LOG_WRN("No scan_result callback.");
-	}
+    scan_result_info_t *temp = NULL;
+    temp = (scan_result_info_t *)malloc(sizeof(scan_result_info_t));
+    if(temp == NULL){
+        LOG_ERR("malloc failed");
+        return -ENOMEM;
+    }
 
-    osThreadYield();
-#endif
+    memcpy(&(temp->res), event, len);
+    list_add_tail(&temp->res_list, &g_scan_list);
+    scan_ap_cnt ++;
+    LOG_DBG("scan malloc:%p", temp);
+
 	return 0;
 }
 
@@ -489,16 +494,18 @@ static int wifi_evt_scan_done(struct wifi_device *wifi_dev, char *data, int len)
 	if (check_cmdevt_len(len, sizeof(struct event_scan_done))) {
 		return -EINVAL;
 	}
-#if 0
-	if (wifi_dev->scan_result_cb) {
-		wifi_dev->scan_result_cb(wifi_dev->iface, event->status, NULL);
-		wifi_dev->scan_result_cb = NULL;
-	} else {
-		LOG_WRN("No scan_result callback.");
-	}
-#endif
-    k_sem_release(scan_done_sem);
+
+    uwp_wifi_msg_t msg = malloc(sizeof(struct UWP_MSG_STRUCT));
+    if(msg == NULL){
+        LOG_ERR("mlloc failed");
+        return -ENOMEM;
+    }
+    msg->type = STA_SCAN_TYPE;
+    msg->arg1 = scan_ap_cnt;
+    k_msg_put(g_wifi_mgmt_queue, &msg, osWaitForever);
+
     LOG_DBG("STA SCAN DONE");
+
     return 0;
 }
 

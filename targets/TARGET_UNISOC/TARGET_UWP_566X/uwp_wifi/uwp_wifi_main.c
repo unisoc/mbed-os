@@ -36,6 +36,9 @@
 #define DEV_DATA(dev) \
 	((struct wifi_priv *)(dev)->driver_data)
 
+void *g_wifi_mgmt_queue = NULL;
+struct list_head g_scan_list;
+
 static struct wifi_priv uwp_wifi_priv_data;
 static struct wifi_priv uwp_wifi_dev;
 static bool cp_initialized = false;
@@ -660,6 +663,15 @@ int uwp_mgmt_open(void){
         LOG_DBG("WIFI STA OPENED");
         return 0;
     }
+
+    g_wifi_mgmt_queue = k_msg_create(10);
+    if(g_wifi_mgmt_queue == NULL){
+        LOG_ERR("malloc failed");
+        return -ENOMEM;
+    }
+
+    __INIT_LIST_HEAD(&g_scan_list);
+
     ret = wifi_cmd_open(&(uwp_wifi_dev.wifi_dev[0]));
     if(ret == 0){
         for(i = 0; i < 10; i ++){
@@ -671,25 +683,58 @@ int uwp_mgmt_open(void){
     uwp_wifi_dev.wifi_dev[0].opened = true;
     return ret;
 }
-// TODO: msg is reasonable
-void *scan_done_sem = NULL;
-extern int scan_cnt;
+
 int uwp_mgmt_scan(uint8_t band, uint8_t channel)
 {
     int ret = -1;
     struct wifi_drv_scan_params para;
     para.band = band;
     para.channel = channel;
-    if(scan_done_sem == NULL)
-        scan_done_sem = k_sem_create(1, 0);
+    uwp_wifi_msg_t msg = NULL;
+
+    g_wifi_mgmt_queue = k_msg_create(10);
+    if(g_wifi_mgmt_queue == NULL){
+        LOG_ERR("malloc failed");
+        return -ENOMEM;
+    }
+
     ret = wifi_cmd_scan(&(uwp_wifi_dev.wifi_dev[0]), &para);
     if(ret != 0)
         return ret;
-    else
-        k_sem_acquire(scan_done_sem, 10000);
-    return scan_cnt;
+    k_msg_get(g_wifi_mgmt_queue, &msg, 10000);
+    if(msg->type == STA_SCAN_TYPE)
+        ret = msg->arg1;
+    LOG_DBG("find ap:%d",ret);
+    free(msg);
+    return ret;
 }
 
+int uwp_mgmt_get_scan_result(void *buf, int num){
+    int cnt = 0;
+    struct list_head *p_node = NULL, *p_del = NULL;
+    struct list_head *p_head = &g_scan_list;
+    struct event_scan_result *data = (struct event_scan_result*)buf;
+
+    p_node = p_head->next;
+    while((p_node != p_head) && (cnt <= num)){
+        memcpy(&data[cnt], (void *)(((uint32_t)p_node) - sizeof(struct event_scan_result)),
+                        sizeof(struct event_scan_result));
+        p_node = p_node->next;
+        cnt ++;
+    }
+
+    p_node = p_head->next;
+    while(p_node != p_head){
+        p_node->next->prev = p_node->prev;
+        p_node->prev->next = p_node->next;
+        p_del = p_node;
+        p_node = p_node->next;
+        LOG_DBG("free scan:%x",(((uint32_t)p_del) - sizeof(struct event_scan_result)));
+        free((void *)(((uint32_t)p_del) - sizeof(struct event_scan_result)));
+    }
+
+    return cnt;
+}
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel)
 {
     struct wifi_drv_connect_params para;

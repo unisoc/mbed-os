@@ -24,6 +24,10 @@ typedef enum{
 	WIFI_MODE_AP
 }UWP_WIFI_MODE_T;
 
+typedef enum{
+    STA_SCAN_TYPE = 0,
+}UWP_MGMT_MODE_T;
+
 #define WIFI_MODE_AP (2)
 /* #define WIFI_MODE_APSTA (3) */
 /* #define WIFI_MODE_MONITOR (4) */
@@ -84,6 +88,7 @@ static inline u32_t uwp_get_addr_from_payload(u32_t payload)
 int uwp_cp_init(void);
 int uwp_mgmt_open(void);
 int uwp_mgmt_scan(uint8_t band, uint8_t channel);
+int uwp_mgmt_get_scan_result(void *buf, int num);
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel);
 int uwp_mgmt_tx(uint8_t *pkt, uint32_t pkt_len);
 int uwp_mgmt_getmac(uint8_t * addr);
