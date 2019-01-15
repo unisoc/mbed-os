@@ -20,8 +20,10 @@ void *k_sem_create(uint32_t max_count, uint32_t initial_count){
 int k_sem_release(void *sem){
     osStatus_t ret = -1;
     ret = osSemaphoreRelease((osSemaphoreId_t)sem);
-	if(ret != osOK)
-		UWP_SYS_PRINT("release sem error:%d\r\n",ret);
+	if(ret == osErrorResource)
+		UWP_SYS_PRINT("WRN:maximum sem count has been reached\r\n");
+    else if(ret != osOK)
+        UWP_SYS_PRINT("release sem error:%d\r\n",ret);
 	return (int)ret;
 }
 
@@ -145,3 +147,11 @@ int k_msg_get(void *msgid, uwp_wifi_msg_t *msg, unsigned int ms){
         UWP_SYS_PRINT("msg get failed\r\n");
     return (int)ret;
 }
+
+void list_add_tail(struct list_head *node, struct list_head *list){
+    struct list_head *p_node = list;
+    while(p_node->next != list)
+        p_node = p_node->next;
+    __LIST_ADD(node,p_node,list);
+}
+

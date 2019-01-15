@@ -11,6 +11,7 @@
 extern "C" {
 #endif
 
+#include "uwp_sys_wrapper.h"
 #include "uwp_wifi_main.h"
 
 #define MAX_SSID_LEN (33) /* SSID end with 0 */
@@ -220,6 +221,14 @@ struct event_new_station {
 	/* u16_t ie_len; */
 	/* u8_t ie[0]; */
 }PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
+
+typedef 
+PACK_STRUCT_BEGIN
+struct{
+    struct event_scan_result res;
+    struct list_head res_list;
+}PACK_STRUCT_STRUCT scan_result_info_t;
 PACK_STRUCT_END
 
 /* int wifi_cmd_load_ini(u8_t *pAd); */

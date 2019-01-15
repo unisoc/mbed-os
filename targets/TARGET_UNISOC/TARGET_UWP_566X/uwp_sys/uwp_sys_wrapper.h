@@ -71,6 +71,25 @@ static inline void sys_slist_init(sys_slist_t *list){
 	list->tail = NULL;
 }
 
+struct list_head{
+    struct list_head *next, *prev;
+};
+
+static inline void __INIT_LIST_HEAD(struct list_head *list){
+    list->next = list;
+    list->prev = list;
+}
+
+static inline void __LIST_ADD(struct list_head *newlist, 
+            struct list_head *prev, struct list_head *next){
+    next->prev = newlist;
+    newlist->next = next;
+    prev->next = newlist;
+    newlist->prev = prev;
+}
+
+void list_add_tail(struct list_head *newlist, struct list_head *list);
+
 /* global variable for test */
 //extern void *sys_sem;
 //extern void *sys_mutex;

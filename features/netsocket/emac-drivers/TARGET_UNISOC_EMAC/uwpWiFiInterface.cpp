@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-#include "WIFIInterface.h"
-#include "UWPWIFIInterface.h"
+#include "WiFiInterface.h"
+#include "uwpWiFiInterface.h"
 #include "nsapi_types.h"
 #include "uwp_emac.h"
 #include "uwp_wifi_cmdevt.h"
-
 
 /* Interface implementation */
 //WiFiInterface::WiFiInterface(EMAC &emac, OnboardNetworkStack &stack) :
@@ -257,10 +256,17 @@ nsapi_error_t UWPWiFiInterface::disconnect()
 nsapi_size_or_error_t UWPWiFiInterface::scan(WiFiAccessPoint *res, nsapi_size_t count)
 {
     int ret;
-    printf("%s\r\n",__func__);
     init();
     ret = uwp_mgmt_scan(0, 0);
-	printf("ap cnt:%d\r\n",ret);
+    struct event_scan_result *bss = (struct event_scan_result *)malloc(ret * sizeof(struct event_scan_result));
+    if(bss == NULL)
+        return NSAPI_ERROR_NO_MEMORY;
+    memset(bss, 0, ret * sizeof(struct event_scan_result));
+    uwp_mgmt_get_scan_result(bss, ret);
+    for(int i=0; i<ret; i++){
+        printf("ssid:%-36s   rssi:%d\r\n",bss[i].ssid, bss[i].rssi);
+    }
+    free(bss);
     return 0;
 #if 0
 	int bss_num = 0, i;
