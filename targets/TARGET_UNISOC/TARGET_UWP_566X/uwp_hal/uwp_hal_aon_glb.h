@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef __HAL_AON_GLB_H
-#define __HAL_AON_GLB_H
+#ifndef MBED_UWP_HAL_AON_GLB_H
+#define MBED_UWP_HAL_AON_GLB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,68 +41,68 @@ extern "C" {
 #define REG_AON_GPIO_MODE1		(BASE_AON_GLB + 0x20C)
 #define REG_AON_GPIO_MODE2		(BASE_AON_GLB + 0x210)
 
-	enum {
-		AON_EB_SYST = 0,
-		AON_EB_TMR0,
-		AON_EB_TMR1,
-		AON_EB_TMR2,
-		AON_EB_DJTAG,
-		AON_EB_EIC0,
-		AON_EB_EIC_RTC,
-		AON_EB_EIC1,
-		AON_EB_I2C,
-		AON_EB_INTC,
-		AON_EB_PIN,
-		AON_EB_EFUSE,
-		AON_EB_GPIO0,
-		AON_EB_GPIO1,
-		AON_EB_GPIO2,
-		AON_EB_GPIO3,
-		AON_EB_GPIO4 = 16,
-		AON_EB_GPIO5,
-		AON_EB_GPIO6,
-		AON_EB_GPIO7,
-		AON_EB_RTC_BB,
-		AON_EB_SPINLOCK,
-		AON_EB_CLK_REG,
-		AON_EB_PIN_REG,
-		AON_EB_GLB_REG,
-		AON_EB_IIS,
-		AON_EB_PCIE_PHY,
-		AON_EB_FUNTST,
-		AON_EB_UART,
-		AON_EB_SFC_2X,
-		AON_EB_CM4_DAP0,
-		AON_EB_CM4_DAP1,
-	};
+enum {
+    AON_EB_SYST = 0,
+    AON_EB_TMR0,
+    AON_EB_TMR1,
+    AON_EB_TMR2,
+    AON_EB_DJTAG,
+    AON_EB_EIC0,
+    AON_EB_EIC_RTC,
+    AON_EB_EIC1,
+    AON_EB_I2C,
+    AON_EB_INTC,
+    AON_EB_PIN,
+    AON_EB_EFUSE,
+    AON_EB_GPIO0,
+    AON_EB_GPIO1,
+    AON_EB_GPIO2,
+    AON_EB_GPIO3,
+    AON_EB_GPIO4 = 16,
+    AON_EB_GPIO5,
+    AON_EB_GPIO6,
+    AON_EB_GPIO7,
+    AON_EB_RTC_BB,
+    AON_EB_SPINLOCK,
+    AON_EB_CLK_REG,
+    AON_EB_PIN_REG,
+    AON_EB_GLB_REG,
+    AON_EB_IIS,
+    AON_EB_PCIE_PHY,
+    AON_EB_FUNTST,
+    AON_EB_UART,
+    AON_EB_SFC_2X,
+    AON_EB_CM4_DAP0,
+    AON_EB_CM4_DAP1,
+};
 
-	enum {
-		AON_RST_CLK_TOP = 0,
-		AON_RST_PMU,
-		AON_RST_RTC_BB,
-		AON_RST_UART,
-		AON_RST_SYST,
-		AON_RST_TMR0,
-		AON_RST_TMR1,
-		AON_RST_TMR2,
-		AON_RST_EIC0,
-		AON_RST_EIC1,
-		AON_RST_I2C,
-		AON_RST_EFUSE,
-		AON_RST_INTC,
-		AON_RST_SPINLOCK,
-		AON_RST_GPIO0,
-		AON_RST_GPIO1,
-		AON_RST_GPIO2 = 16,
-		AON_RST_DCXO,
-		AON_RST_GPIO4,
-		AON_RST_GPIO5,
-		AON_RST_GPIO6,
-		AON_RST_FM_RF,
-		AON_RST_CLK_REG,
-		AON_RST_PIN_REG,
-		AON_RST_GLB_REG,
-	};
+enum {
+    AON_RST_CLK_TOP = 0,
+    AON_RST_PMU,
+    AON_RST_RTC_BB,
+    AON_RST_UART,
+    AON_RST_SYST,
+    AON_RST_TMR0,
+    AON_RST_TMR1,
+    AON_RST_TMR2,
+    AON_RST_EIC0,
+    AON_RST_EIC1,
+    AON_RST_I2C,
+    AON_RST_EFUSE,
+    AON_RST_INTC,
+    AON_RST_SPINLOCK,
+    AON_RST_GPIO0,
+    AON_RST_GPIO1,
+    AON_RST_GPIO2 = 16,
+    AON_RST_DCXO,
+    AON_RST_GPIO4,
+    AON_RST_GPIO5,
+    AON_RST_GPIO6,
+    AON_RST_FM_RF,
+    AON_RST_CLK_REG,
+    AON_RST_PIN_REG,
+    AON_RST_GLB_REG,
+};
 
 #define BIT_AON_APB_CGM_SDIO_FRUN_EN                BIT(26)
 #define BIT_AON_APB_CGM_RTCDV5_EN                   BIT(25)
@@ -132,38 +132,35 @@ extern "C" {
 #define BIT_AON_APB_CGM_PCIE_AUX_AUTO_EN            BIT(1)
 #define BIT_AON_APB_CGM_PCIE_AUX_EN                 BIT(0)
 
-	typedef enum _clk_arm_sel
-	{
-		CLK_26M   = 0x20,
-		CLK_46M   = 0x10,
-		CLK_52M   = 0xe,
-		CLK_64M   = 0xa,
-		CLK_83M   = 0x8,
-		CLK_104M   = 0x6,
-		CLK_139M   = 0x4,
-		CLK_166M   = 0x3,
-		CLK_208M   = 0x2,
-		CLK_277M   = 0x1,
-		CLK_416M   = 0x0,
-	} CLK_ARM_SEL_E;
+typedef enum _clk_arm_sel
+{
+    CLK_26M   = 0x20,
+    CLK_46M   = 0x10,
+    CLK_52M   = 0xe,
+    CLK_64M   = 0xa,
+    CLK_83M   = 0x8,
+    CLK_104M   = 0x6,
+    CLK_139M   = 0x4,
+    CLK_166M   = 0x3,
+    CLK_208M   = 0x2,
+    CLK_277M   = 0x1,
+    CLK_416M   = 0x0,
+} CLK_ARM_SEL_E;
 
-	static inline void uwp_aon_enable(u32_t bits) {
-		sci_glb_set(REG_AON_GLB_EB, bits);
-	}
+static inline void uwp_aon_enable(u32_t bits) {
+    sci_glb_set(REG_AON_GLB_EB, bits);
+}
 
-	static inline void uwp_aon_disable(u32_t bits) {
-		sci_glb_clr(REG_AON_GLB_EB, bits);
-	}
+static inline void uwp_aon_disable(u32_t bits) {
+    sci_glb_clr(REG_AON_GLB_EB, bits);
+}
 
-	static inline void uwp_aon_reset(u32_t bits) {
-		int i = 50;
-
-		sci_glb_set(REG_AON_RST, bits);
-
-		while(i--) ;
-
-		sci_glb_clr(REG_AON_RST, bits);
-	}
+static inline void uwp_aon_reset(u32_t bits) {
+    int i = 50;
+    sci_glb_set(REG_AON_RST, bits);
+    while(i--) ;
+    sci_glb_clr(REG_AON_RST, bits);
+}
 
 #ifdef __cplusplus
 }

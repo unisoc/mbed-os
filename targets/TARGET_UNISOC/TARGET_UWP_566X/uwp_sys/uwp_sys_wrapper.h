@@ -62,13 +62,13 @@ struct _snode{
 typedef struct _snode sys_snode_t;
 struct _slist{
     sys_snode_t *head;
-	sys_snode_t *tail;
+    sys_snode_t *tail;
 };
 typedef struct _slist sys_slist_t;
 
 static inline void sys_slist_init(sys_slist_t *list){
     list->head = NULL;
-	list->tail = NULL;
+    list->tail = NULL;
 }
 
 struct list_head{

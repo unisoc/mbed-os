@@ -22,6 +22,9 @@ extern "C" {
 #define GPIO_TRIGGER_BOTH_EDGE		1
 #define GPIO_TRIGGER_LEVEL_HIGH		2
 #define GPIO_TRIGGER_LEVEL_LOW		3
+#define GPIO_TRIGGER_HIGH_EDGE		4
+#define GPIO_TRIGGER_LOW_EDGE		5
+
 
 struct uwp_gpio {
 		u32_t data;		/* data */
@@ -92,7 +95,7 @@ typedef struct{
 	{
 		volatile struct uwp_gpio *gpio = UWP_GPIO(base);
 
-		return ~(gpio->data & pin);
+		return (gpio->data & pin);
 	}
 
 	static inline void uwp_gpio_set_dir(u32_t base,
@@ -106,25 +109,33 @@ typedef struct{
 			gpio->dir &= (~pin_map);
 	}
 
-	static inline void uwp_gpio_int_set_type(u32_t base,
-			u32_t pin_map, u32_t type)
-	{
-		volatile struct uwp_gpio *gpio = UWP_GPIO(base);
+static inline void uwp_gpio_int_set_type(u32_t base,
+        u32_t pin_map, u32_t type)
+{
+        volatile struct uwp_gpio *gpio = UWP_GPIO(base);
 
-		if(type == GPIO_TRIGGER_BOTH_EDGE) {
-			gpio->is &= (~pin_map);
-			gpio->ibe |= pin_map;
-		} else {
-			gpio->is |= pin_map;
-			gpio->ibe &= (~pin_map);
+        if (type == GPIO_TRIGGER_BOTH_EDGE) {
+            gpio->is &= (~pin_map);
+            gpio->ibe |= pin_map;
+        } else if (type == GPIO_TRIGGER_HIGH_EDGE) {
+            gpio->is &= (~pin_map);
+            gpio->ibe &= (~pin_map);
+            gpio->iev |= pin_map;
+        } else if (type == GPIO_TRIGGER_LOW_EDGE) {
+            gpio->is &= (~pin_map);
+            gpio->ibe &= (~pin_map);
+            gpio->iev &= (~pin_map);
+        } else {
+            gpio->is |= pin_map;
+            gpio->ibe &= (~pin_map);
 
-			if(type == GPIO_TRIGGER_LEVEL_HIGH)
-				gpio->iev |= pin_map;
-			else
-				gpio->iev &= (~pin_map);
-		}
+            if (type == GPIO_TRIGGER_LEVEL_HIGH)
+                gpio->iev |= pin_map;
+            else
+                gpio->iev &= (~pin_map);
+        }
+}
 
-	}
 
 	static inline void uwp_gpio_int_enable(u32_t base,
 			u32_t pin_map)
