@@ -3354,10 +3354,8 @@ static void process_events(void)
         //BT_DBG("wait cmd queue");
         buf = uki_fixed_queue_dequeue(bt_dev.cmd_tx_queue);
         //BT_DBG("DUMP TX SEND: ");
-        HCI_DUMP("-> ", buf->data, buf->len);
-        sprd_bt_write(buf->data, buf->len);
-        net_buf_unref(buf);
 
+        bt_send(buf);
     }
 #if 0
 	for (; count; ev++, count--) {
@@ -4379,12 +4377,18 @@ static int hci_init(void)
 
 int bt_send(struct net_buf *buf)
 {
-    //BT_DBG("DUMP: TX ACL");
-    HCI_DUMP("-> ", buf->data, buf->len);
-    sprd_bt_write(buf->data, buf->len);
-    net_buf_unref(buf);
+	int ret = 0;
+	if (IS_ENABLED(CONFIG_BT_TINYCRYPT_ECC)) {
+		ret = bt_hci_ecc_send(buf);
+		if (0 == ret)
+			return 0;
+	}
 
-    return 0;
+	HCI_DUMP("-> ", buf->data, buf->len);
+	sprd_bt_write(buf->data, buf->len);
+	net_buf_unref(buf);
+
+	return 0;
 }
 
 int bt_recv(struct net_buf *buf)
