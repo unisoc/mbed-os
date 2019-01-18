@@ -10,7 +10,7 @@
 
 #define CMD_BUF_SIZE BT_BUF_RX_SIZE
 #define MOD_NUMBER      256
-#define DEFAULT_SIZE    32
+#define DEFAULT_SIZE    128
 
 #define ZIF_DEBUG 0
 
