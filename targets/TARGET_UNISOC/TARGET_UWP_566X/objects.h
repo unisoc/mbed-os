@@ -27,9 +27,8 @@ extern "C" {
 #include "gpio_objects.h"
 
 struct gpio_irq_s {
-	int      flags;
-	u32_t    port_base;
-	u32_t    pin_enabled;
+    PinName  pin;
+    u32_t    port_base;
 };
 
 struct timer_s{
