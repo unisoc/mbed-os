@@ -24,10 +24,10 @@ static inline int uart_uwp_poll_in(serial_t *obj, unsigned char *c)
 {
     volatile struct uwp_uart *uart = UART_STRUCT(obj);
 
-    if (malin_uart_rx_ready(uart)) {
-        *c = uwp_uart_read(uart);
-        return 0;
-    }
+	if (uwp_uart_rx_ready(uart)) {
+		*c = uwp_uart_read(uart);
+		return 0;
+	}
 
     return -1;
 }
@@ -241,8 +241,8 @@ void serial_init(serial_t *obj, PinName tx, PinName rx){
 
 void uart0_irq(void){
 #if 0    
-     volatile struct uwp_uart *uart = (volatile struct uwp_uart *)stdio_uart.base;
-     if(malin_uart_rx_ready(uart)){
+	 volatile struct uwp_uart *uart = (volatile struct uwp_uart *)stdio_uart.base;
+	 if(uwp_uart_rx_ready(uart)){
          mbed_error_printf("%c ", uart->rxd.rxd);
      }
      mbed_error_printf("\r\n");
@@ -270,10 +270,10 @@ int  serial_getc(serial_t *obj){
 
 void serial_putc(serial_t *obj, int c){
     volatile struct uwp_uart *uart = UART_STRUCT(obj);
-    if (malin_uart_tx_ready(uart)) {
-        uwp_uart_write(uart, c);
-        while (!uwp_uart_trans_over(uart));
-    }
+	if (uwp_uart_tx_ready(uart)) {
+		uwp_uart_write(uart, c);
+		while (!uwp_uart_trans_over(uart));
+	}      
 }
 
 void serial_baud(serial_t *obj, int baudrate){
@@ -283,12 +283,12 @@ void serial_baud(serial_t *obj, int baudrate){
 
 int  serial_readable(serial_t *obj){
     volatile struct uwp_uart *uart = UART_STRUCT(obj);
-    return malin_uart_rx_ready(uart);
+    return uwp_uart_rx_ready(uart);
 }
 
 int  serial_writable(serial_t *obj){
     volatile struct uwp_uart *uart = UART_STRUCT(obj);
-    return malin_uart_tx_ready(uart);
+    return uwp_uart_tx_ready(uart);
 }
 
 // TODO: achieve following function

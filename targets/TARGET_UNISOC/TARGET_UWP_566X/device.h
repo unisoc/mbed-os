@@ -18,6 +18,10 @@
 #ifndef MBED_DEVICE_H
 #define MBED_DEVICE_H
 
+#include "cmsis.h"
+#include "uwp_hal.h"
+#include "PinNames.h"
+#include "PeripheralNames.h"
 #include "objects.h"
 #include "serial_objects.h"
 

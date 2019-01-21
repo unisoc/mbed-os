@@ -44,7 +44,7 @@ SECTIONS
     .text :
     {
         KEEP(*(.isr_vector))
-        *(EXCLUDE_FILE (*uwp_hal_sfc.o *uwp_hal_sfc_phy.o *ramfunc_flash_api.o) .text*)
+        *(EXCLUDE_FILE (*hal_ramfunc.o *hal_sfc.o *hal_sfc_phy.o *ramfunc_flash_api.o) .text*)
 
         KEEP(*(.init))
         KEEP(*(.fini))
@@ -120,8 +120,9 @@ SECTIONS
     .ramtext : AT (__ramfunc_start__)
     {
         __ramtext_start__ = .;
-        *uwp_hal_sfc.o(.text*)
-        *uwp_hal_sfc_phy.o(.text*)
+        *hal_ramfunc.o(.text*)
+        *hal_sfc.o(.text*)
+        *hal_sfc_phy.o(.text*)
         *ramfunc_flash_api.o(.text*)
         __ramtext_end__ = .;
     } > IRAM

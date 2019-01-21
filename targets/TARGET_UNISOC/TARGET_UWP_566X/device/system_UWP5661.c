@@ -23,6 +23,7 @@
  ******************************************************************************/
 
 #include "cmsis.h"
+#include "uwp_hal.h"
 
 /** @addtogroup UWP5661_System
  * @{
@@ -128,7 +129,7 @@ void SystemCoreClockUpdate (void)            /* Get Core/Bus Clock Frequency    
 {
     return;
 }
-
+#if 0
 static inline void uwp_glb_init(void)
 {
 	/* Set system clock to 416M */
@@ -155,7 +156,7 @@ static inline void uwp_glb_init(void)
 	/* 0x40844024 */
 	sci_reg_and(REG_AON_CLK_PRE_DIV_PLL_WAIT_SEL0_CFG, ~BIT(2));
 }
-
+#endif
 /**
  * Initialize the system
  *

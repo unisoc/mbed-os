@@ -4,21 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef MBED_SERIAL_OBJECTS_H
-#define MBED_SERIAL_OBJECTS_H
-
-#include "hal_uart.h"
+#ifndef __HAL_SOC_H
+#define __HAL_SOC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct serial_s {
-    u32_t base;
-    u32_t sys_clk_freq;
-    u32_t baud_rate;
-};
+#include "uwp_hal.h"
 
+extern void uwp_cache_init(void);
+extern void uwp_glb_init(void);
+extern int uwp_mcu_init(void);
 
 #ifdef __cplusplus
 }

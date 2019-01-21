@@ -15,7 +15,6 @@
  */
 #include "us_ticker_api.h"
 #include "mbed_critical.h"
-#include "uwp_type.h"
 #include "objects.h"
 
 #define BIT_TIMER_RUN           1
@@ -40,9 +39,9 @@ typedef struct {
 	volatile uint32_t shdw_h;
 }TimerReg;
 
-typedef struct timer_s timer_t;
+typedef struct my_timer_s my_timer_t;
 
-timer_t UsTicker = {
+my_timer_t UsTicker = {
     .base = 0x40050000,
 	.mode = TIMER_MODE_PERIOD,
 	.wid_mode = TIMER_MODE_32BIT,
