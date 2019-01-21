@@ -15,6 +15,9 @@
 serial_t stdio_uart = {0x40038000, 26000000, 115200};
 int stdio_uart_inited = 0;
 
+#define UART_NUM    2
+static uart_irq_handler irq_handler[UART_NUM] = {NULL};
+
 /** zephyr reference */
 
 static inline int uart_uwp_poll_in(serial_t *obj, unsigned char *c)
@@ -237,11 +240,17 @@ void serial_init(serial_t *obj, PinName tx, PinName rx){
 }
 
 void uart0_irq(void){
+#if 0    
+     volatile struct uwp_uart *uart = (volatile struct uwp_uart *)stdio_uart.base;
+     if(malin_uart_rx_ready(uart)){
+         mbed_error_printf("%c ", uart->rxd.rxd);
+     }
+     mbed_error_printf("\r\n");
+#endif
     volatile struct uwp_uart *uart = (volatile struct uwp_uart *)stdio_uart.base;
-    if(malin_uart_rx_ready(uart)){
-        mbed_error_printf("%c ", uart->rxd.rxd);
-    }
-    mbed_error_printf("\r\n");
+    uwp_uart_int_disable(uart, UART_RXD);
+    (irq_handler[0])(0, RxIrq);
+    uwp_uart_int_enable(uart, BIT(UART_RXF_FULL));
 }
 void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable){
     volatile struct uwp_uart *uart = UART_STRUCT(obj);
@@ -297,6 +306,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
 }
 
 void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id){
+    irq_handler[0] = handler;
     return;
 }
 
