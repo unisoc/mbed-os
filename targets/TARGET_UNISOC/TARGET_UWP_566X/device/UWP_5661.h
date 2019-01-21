@@ -112,7 +112,7 @@ typedef enum IRQn
 /******************************************************************************/
 /*                 data type header and bit operation definition              */
 /******************************************************************************/
-#include "uwp_type.h"
+#include "uwp_def.h"
 
 /******************************************************************************/
 /*                         Peripheral memory map                              */
@@ -120,19 +120,11 @@ typedef enum IRQn
 
 /* Base addresses                                                             */
 #define UWP_IRAM_BASE         (0x00100000UL)
-#define UWP_DRAM_BASE         (0x00120000UL)
+#define UWP_DRAM_BASE         (0x00180000UL)
 #define UWP_FLASH_BASE        (0x02000000UL)
 
 /* peripheral base address definition                                         */
-#include "uwp_hal_base.h"
-#include "uwp_hal_sys.h"
-#include "uwp_hal_aon_glb.h"
-#include "uwp_hal_aon_clk.h"
-#include "uwp_hal_intc.h"
-#include "uwp_hal_sfc.h"
-#include "uwp_hal_sfc_cfg.h"
-#include "uwp_hal_sfc_phy.h"
-#include "uwp_cache.h"
+
 
 #ifdef __cplusplus
 }

@@ -9,8 +9,6 @@
 #define LED1 (1)
 #define STDIO_UART_TX NC
 #define STDIO_UART_RX NC
-#define USBTX         NC
-#define USBRX         NC
 
 #define MBED_UARTUSB      USBTX, USBRX
 #endif
