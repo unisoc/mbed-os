@@ -16,22 +16,34 @@
 #ifndef MBED_OBJECTS_H
 #define MBED_OBJECTS_H
 
+#include "PinNames.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "uwp_type.h"
-#include "cmsis.h"
-#include "PinNames.h"
-#include "PeripheralNames.h"
-#include "gpio_objects.h"
+typedef struct{
+    uint32_t port_base;
+    PinName pin;
+} gpio_t;
 
 struct gpio_irq_s {
     PinName  pin;
-    u32_t    port_base;
+    uint32_t    port_base;
 };
 
-struct timer_s{
+typedef enum{
+    TIMER_MODE_FREE,
+    TIMER_MODE_PERIOD
+}TIMER_MODE_T;
+
+typedef enum{
+    TIMER_MODE_32BIT = 0,
+    TIMER_MODE_64BIT,
+    TIMER_MODE_MAXA
+}TIMER_WID_MODE_T;
+
+struct my_timer_s{
     uint32_t base;
     TIMER_MODE_T mode;
     TIMER_WID_MODE_T wid_mode;

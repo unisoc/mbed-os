@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "UWP_5661.h"
+#include "hal_sfc.h"
 
 #define FLASH_WRITE_BLOCK_SIZE 0x1
 
@@ -120,27 +120,25 @@ static const struct flash_driver_api flash_uwp_api = {
 
 int uwp_flash_init(struct spi_flash_struct *dev)
 {
-	int ret = 0;
+    int ret = 0;
 
-	struct spi_flash_params *params = dev->params;
-	struct spi_flash *flash = &(dev->flash);
-	core_util_critical_section_enter();
+    struct spi_flash_params *params = dev->params;
+    struct spi_flash *flash = &(dev->flash);
 
-	spiflash_select_xip(TRUE);
+    spiflash_select_xip(FALSE);
 
-	SFCDRV_EnableInt();
+    sfcdrv_intcfg(FALSE);
 
-	spiflash_reset_anyway();
+    spiflash_reset_anyway();
 
-	spiflash_set_clk();
+    spiflash_set_clk();
 
-	ret = uwp_spi_flash_init(flash, &params);
-	if (ret) {
-		mbed_error_printf("uwp spi flash init failed. ret:[%d]\n", ret);
-		return ret;
-	}
-	
-	core_util_critical_section_exit();
-	return ret;
+    ret = uwp_spi_flash_init(flash, &params);
+    if (ret) {
+        mbed_error_printf("uwp spi flash init failed. ret:[%d]\n", ret);
+        return ret;
+    }
+
+    return ret;
 }
 

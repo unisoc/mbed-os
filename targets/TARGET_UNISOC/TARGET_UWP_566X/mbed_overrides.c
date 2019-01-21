@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 #include "cmsis.h"
-#include "uwp_wifi_main.h"
+#include "hal_sfc.h"
+#include "uwp_intc.h"
+#include "sipc.h"
+#include "ipi.h"
 
 /* This function is called after RAM initialization and before main. */
+extern int uwp_flash_init(struct spi_flash_struct *dev);
 void mbed_sdk_init(void){
-	struct spi_flash_struct flash_test;
-	uwp_flash_init(&flash_test);
-	uwp_cache_init();
-	intc_uwp_init();
-	aon_intc_uwp_init();
+    struct spi_flash_struct flash_test;
+    uwp_cache_init();
+    uwp_flash_init(&flash_test);
+    intc_uwp_init();
+    aon_intc_uwp_init();
+}
+
+void mbed_main(void){
+    sipc_init();
+    ipi_uwp_init();
 }
 
