@@ -6,8 +6,8 @@
 #include "debug.h"
 #include "uwp_emac.h"
 #include "uwp_wifi_main.h"
-#include "uwp_sipc.h"
-#include "uwp_ipi.h"
+#include "sipc.h"
+#include "ipi.h"
 #include "uwp_sys_wrapper.h"
 
 
