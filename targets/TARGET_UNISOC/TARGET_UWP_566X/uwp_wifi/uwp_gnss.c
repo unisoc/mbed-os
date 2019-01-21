@@ -304,11 +304,11 @@
 #define IQ_COMP_ENB     BIT(0)
 
 typedef enum {
-	RF_GPS_MODE = 0,
-	RF_BD2_MODE,
-	RF_GPS_BD2_MODE,
-	RF_GPS_GLO_MODE,
-	RF_GPS_BD_GLO_MODE
+    RF_GPS_MODE = 0,
+    RF_BD2_MODE,
+    RF_GPS_BD2_MODE,
+    RF_GPS_GLO_MODE,
+    RF_GPS_BD_GLO_MODE
 } RF_WORK_MODE;
 
 #define BIT_AON_APB_GNSS_RF_CTRL_GNSS_RF_CTRL_ADDR          REG_AON_APB_GNSS_RF_CTRL
@@ -346,357 +346,357 @@ typedef enum {
 #define RF_SYS_CLK  266
 
 #define APB_ADC_ENABLE() \
-	(sci_reg_or(REG_AON_APB_ADDA_TEST_CTRL3, BIT_AON_APB_ADDA_TEST_CTRL3_GNSS_ADC_EN_ADDR_MASK))
+    (sci_reg_or(REG_AON_APB_ADDA_TEST_CTRL3, BIT_AON_APB_ADDA_TEST_CTRL3_GNSS_ADC_EN_ADDR_MASK))
 
 #define APB_ADC_DISABLE() \
-	(sci_reg_and(REG_AON_APB_ADDA_TEST_CTRL3, ~BIT_AON_APB_ADDA_TEST_CTRL3_GNSS_ADC_EN_ADDR_MASK))
+    (sci_reg_and(REG_AON_APB_ADDA_TEST_CTRL3, ~BIT_AON_APB_ADDA_TEST_CTRL3_GNSS_ADC_EN_ADDR_MASK))
 
 #define APB_GNSS_POWER_ON() \
-	(sci_reg_and(REG_AON_APB_PD_GNSS_IP_AON_CFG4, ~BIT_AON_APB_PD_GNSS_IP_AON_CFG4_GNSS_IP_POWER_DOWN_ADDR_MASK))
+    (sci_reg_and(REG_AON_APB_PD_GNSS_IP_AON_CFG4, ~BIT_AON_APB_PD_GNSS_IP_AON_CFG4_GNSS_IP_POWER_DOWN_ADDR_MASK))
 
 #define APB_GNSS_POWER_OFF() \
-	(sci_reg_or(REG_AON_APB_PD_GNSS_IP_AON_CFG4, BIT_AON_APB_PD_GNSS_IP_AON_CFG4_GNSS_IP_POWER_DOWN_ADDR_MASK))
+    (sci_reg_or(REG_AON_APB_PD_GNSS_IP_AON_CFG4, BIT_AON_APB_PD_GNSS_IP_AON_CFG4_GNSS_IP_POWER_DOWN_ADDR_MASK))
 
 
 #define APB_GET_GNSS_POWERON_FINISH() \
-	((sci_read32(REG_AON_APB_CHIP_SLP) & BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_PWRON_FINISH_ADDR_MASK) >> BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_PWRON_FINISH_ADDR_SHIFT)
+    ((sci_read32(REG_AON_APB_CHIP_SLP) & BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_PWRON_FINISH_ADDR_MASK) >> BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_PWRON_FINISH_ADDR_SHIFT)
 
-#define APB_GET_GNSS_SLEEPING()	\
-	((sci_read32(REG_AON_APB_CHIP_SLP) & BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_SLEEPING_ADDR_MASK) >> BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_SLEEPING_ADDR_SHIFT)
+#define APB_GET_GNSS_SLEEPING()    \
+    ((sci_read32(REG_AON_APB_CHIP_SLP) & BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_SLEEPING_ADDR_MASK) >> BIT_AON_APB_CHIP_SLP_GNSS_SS_GNSS_SLEEPING_ADDR_SHIFT)
 
-#define APB_SET_FAKE_CLK(clk_sel, div)														      \
-	do {																	      \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_DIV_ADDR_MASK));			      \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, (((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_DIV_ADDR_SHIFT)));     \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_SEL_ADDR_MASK));			      \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, (((clk_sel) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_SEL_ADDR_SHIFT))); \
-	} while (0)
+#define APB_SET_FAKE_CLK(clk_sel, div)                                                              \
+    do {                                                                          \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_DIV_ADDR_MASK));                  \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, (((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_DIV_ADDR_SHIFT)));     \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_SEL_ADDR_MASK));                  \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_FAKE_CFG, (((clk_sel) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_FAKE_CFG_CGM_GNSS_FAKE_SEL_ADDR_SHIFT))); \
+    } while (0)
 
-#define APB_SET_ARM_CLK(div)														     \
-	do {																     \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_ARM_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_ARM_CFG_CGM_GNSS_ARM_DIV_ADDR_MASK));		     \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_ARM_CFG, ((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_ARM_CFG_CGM_GNSS_ARM_DIV_ADDR_SHIFT)); \
-	} while (0)
+#define APB_SET_ARM_CLK(div)                                                             \
+    do {                                                                     \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_ARM_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_ARM_CFG_CGM_GNSS_ARM_DIV_ADDR_MASK));             \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_ARM_CFG, ((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_ARM_CFG_CGM_GNSS_ARM_DIV_ADDR_SHIFT)); \
+    } while (0)
 
-#define APB_SET_APB_CLK(clk_sel)														 \
-	do {																	 \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_APB_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_APB_CFG_CGM_GNSS_APB_SEL_ADDR_MASK));			 \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_APB_CFG, ((clk_sel) & 0x1) << BIT_AON_CLK_RF_CGM_GNSS_APB_CFG_CGM_GNSS_APB_SEL_ADDR_SHIFT)); \
-	} while (0)
+#define APB_SET_APB_CLK(clk_sel)                                                         \
+    do {                                                                     \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_APB_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_APB_CFG_CGM_GNSS_APB_SEL_ADDR_MASK));             \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_APB_CFG, ((clk_sel) & 0x1) << BIT_AON_CLK_RF_CGM_GNSS_APB_CFG_CGM_GNSS_APB_SEL_ADDR_SHIFT)); \
+    } while (0)
 
-#define APB_SET_BB_CLK(div)														  \
-	do {																  \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_BB_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_BB_CFG_CGM_GNSS_BB_DIV_ADDR_MASK));		  \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_BB_CFG, ((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_BB_CFG_CGM_GNSS_BB_DIV_ADDR_SHIFT)); \
-	} while (0)
+#define APB_SET_BB_CLK(div)                                                          \
+    do {                                                                  \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_BB_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_BB_CFG_CGM_GNSS_BB_DIV_ADDR_MASK));          \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_BB_CFG, ((div) & 0x3) << BIT_AON_CLK_RF_CGM_GNSS_BB_CFG_CGM_GNSS_BB_DIV_ADDR_SHIFT)); \
+    } while (0)
 
-#define APB_SET_AE_CLK(div)														  \
-	do {																  \
-		(sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_AE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_AE_CFG_CGM_GNSS_AE_DIV_ADDR_MASK));		  \
-		(sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_AE_CFG, ((div) & 0x7) << BIT_AON_CLK_RF_CGM_GNSS_AE_CFG_CGM_GNSS_AE_DIV_ADDR_SHIFT)); \
-	} while (0)
+#define APB_SET_AE_CLK(div)                                                          \
+    do {                                                                  \
+        (sci_reg_and(REG_AON_CLK_RF_CGM_GNSS_AE_CFG, ~BIT_AON_CLK_RF_CGM_GNSS_AE_CFG_CGM_GNSS_AE_DIV_ADDR_MASK));          \
+        (sci_reg_or(REG_AON_CLK_RF_CGM_GNSS_AE_CFG, ((div) & 0x7) << BIT_AON_CLK_RF_CGM_GNSS_AE_CFG_CGM_GNSS_AE_DIV_ADDR_SHIFT)); \
+    } while (0)
 
 #define CAL_DCOC_DISABLE() \
-	(sci_reg_and(GE_CALI_CTRL, ~DCOC_CAL_ENB))
+    (sci_reg_and(GE_CALI_CTRL, ~DCOC_CAL_ENB))
 
-#define CAL_SET_DCOC_SHIFTBIT(shiftbit)				      \
-	do {							      \
-		(sci_reg_and(GE_CALI_CTRL, 0xFFFF0FFF));	      \
-		(sci_reg_or(GE_CALI_CTRL, ((shiftbit & 0xf) << 16))); \
-	} while (0)
+#define CAL_SET_DCOC_SHIFTBIT(shiftbit)                      \
+    do {                                  \
+        (sci_reg_and(GE_CALI_CTRL, 0xFFFF0FFF));          \
+        (sci_reg_or(GE_CALI_CTRL, ((shiftbit & 0xf) << 16))); \
+    } while (0)
 
 #define SYS_SET_GNSS_BB_EN(value) \
-	(sci_write32(GNSS_BB_EN, value))
+    (sci_write32(GNSS_BB_EN, value))
 
-#define DELAY(time)									 \
-	do {										 \
-		u32_t delay_time;							 \
-		for (delay_time = 0; delay_time < (time * RF_SYS_CLK * 2); delay_time++) \
-		{}									 \
-	} while (0)
+#define DELAY(time)                                     \
+    do {                                         \
+        u32_t delay_time;                             \
+        for (delay_time = 0; delay_time < (time * RF_SYS_CLK * 2); delay_time++) \
+        {}                                     \
+    } while (0)
 
 typedef struct {
-	u32_t divn;
-	u32_t divfrach;
-	u32_t divfracl;
+    u32_t divn;
+    u32_t divfrach;
+    u32_t divfracl;
 } LO_FREQ_STRC;
 #define RF_LO_FREQ_TABLE_CRYSTAL_OFFSET     5
 const LO_FREQ_STRC g_RF_LO_FREQ[10] =
 {
-	{ 0x78, 0xD, 0xF131 },
-	{ 0x77, 0xC, 0x50A9 },
-	{ 0x78, 0xA, 0x2A38 },
-	{ 0x7A, 0x3, 0x296F },
-	{ 0x79, 0xA, 0x592B },
+    { 0x78, 0xD, 0xF131 },
+    { 0x77, 0xC, 0x50A9 },
+    { 0x78, 0xA, 0x2A38 },
+    { 0x7A, 0x3, 0x296F },
+    { 0x79, 0xA, 0x592B },
 
-	{ 0x51, 0xD, 0x70A4 },
-	{ 0x51, 0x1, 0x8148 },
-	{ 0x51, 0xA, 0xE1EC },
-	{ 0x52, 0xB, 0xCEB8 },
-	{ 0x52, 0x5, 0xD70A }
+    { 0x51, 0xD, 0x70A4 },
+    { 0x51, 0x1, 0x8148 },
+    { 0x51, 0xA, 0xE1EC },
+    { 0x52, 0xB, 0xCEB8 },
+    { 0x52, 0x5, 0xD70A }
 };
 
 void RF_readCtlReg(u32_t addr, u32_t *data)
 {
-	u32_t reg_data = 0;
+    u32_t reg_data = 0;
 
-	reg_data = ((addr & 0x7FFF) << 16) | 0x80000000;
-	sci_write32(RF_CTL_MASTER_BASE, reg_data);
-	DELAY(1);
+    reg_data = ((addr & 0x7FFF) << 16) | 0x80000000;
+    sci_write32(RF_CTL_MASTER_BASE, reg_data);
+    DELAY(1);
 
-	reg_data = sci_read32(RF_CTL_MASTER_BASE);
-	*data = reg_data & 0xFFFF;
-	DELAY(1);
+    reg_data = sci_read32(RF_CTL_MASTER_BASE);
+    *data = reg_data & 0xFFFF;
+    DELAY(1);
 }
 
 void RF_writeCtlReg(u32_t addr, u32_t data)
 {
-	u32_t reg_data = 0;
+    u32_t reg_data = 0;
 
-	reg_data = ((addr & 0X7FFF) << 16) | (data & 0xFFFF);
-	sci_write32(RF_CTL_MASTER_BASE, reg_data);
+    reg_data = ((addr & 0X7FFF) << 16) | (data & 0xFFFF);
+    sci_write32(RF_CTL_MASTER_BASE, reg_data);
 
-	DELAY(1);
+    DELAY(1);
 }
 
 void RF_softReset(void)
 {
-	sci_reg_or(SOFT_RST, BIT(1));
-	DELAY(1);
-	sci_reg_and(SOFT_RST, ~BIT(1));
+    sci_reg_or(SOFT_RST, BIT(1));
+    DELAY(1);
+    sci_reg_and(SOFT_RST, ~BIT(1));
 }
 
 void RF_setInterface(void)
 {
-	u32_t sel;
+    u32_t sel;
 
-	sel = 1;
+    sel = 1;
 
-	if (sel) {
-		sci_reg_or(RF_MASTER_CTRL, (SPI_SEL | SPI_HREADY_EN));
-	} else {
-		sci_reg_and(RF_MASTER_CTRL, ~SPI_SEL);
-	}
+    if (sel) {
+        sci_reg_or(RF_MASTER_CTRL, (SPI_SEL | SPI_HREADY_EN));
+    } else {
+        sci_reg_and(RF_MASTER_CTRL, ~SPI_SEL);
+    }
 }
 
 void RF_setSWCtrlFSMState(void)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(GE_MODE_MUX, &data);
-	data &= ~GE_MODE_CTRL_SEL;
-	RF_writeCtlReg(GE_MODE_MUX, data);
+    RF_readCtlReg(GE_MODE_MUX, &data);
+    data &= ~GE_MODE_CTRL_SEL;
+    RF_writeCtlReg(GE_MODE_MUX, data);
 }
 
 void RF_switchState(u32_t state)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(RF_HW_RST_CTRL0, &data);
-	data &= 0xFFFFE1FF;
-	data |= (state << 9);
-	RF_writeCtlReg(RF_HW_RST_CTRL0, data);
+    RF_readCtlReg(RF_HW_RST_CTRL0, &data);
+    data &= 0xFFFFE1FF;
+    data |= (state << 9);
+    RF_writeCtlReg(RF_HW_RST_CTRL0, data);
 }
 
 void RF_setSXFreqDivRatio(LO_FREQ_STRC regs_cfg)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(GE_SX_DIVN_CTRL0, &data);
-	data &= 0xFFFF00FF;
-	data |=  (regs_cfg.divn << 8);
-	RF_writeCtlReg(GE_SX_DIVN_CTRL0, data);
+    RF_readCtlReg(GE_SX_DIVN_CTRL0, &data);
+    data &= 0xFFFF00FF;
+    data |=  (regs_cfg.divn << 8);
+    RF_writeCtlReg(GE_SX_DIVN_CTRL0, data);
 
-	RF_readCtlReg(GE_SX_DIVNFRAC_CTRLH, &data);
-	data &= 0xFFFF0FFF;
-	data |= (regs_cfg.divfrach << 12);
-	RF_writeCtlReg(GE_SX_DIVNFRAC_CTRLH, data);
+    RF_readCtlReg(GE_SX_DIVNFRAC_CTRLH, &data);
+    data &= 0xFFFF0FFF;
+    data |= (regs_cfg.divfrach << 12);
+    RF_writeCtlReg(GE_SX_DIVNFRAC_CTRLH, data);
 
-	RF_readCtlReg(GE_SX_DIVNFRAC_CTRLL, &data);
-	data &= 0xFFFF0000;
-	data |= regs_cfg.divfracl;
-	RF_writeCtlReg(GE_SX_DIVNFRAC_CTRLL, data);
+    RF_readCtlReg(GE_SX_DIVNFRAC_CTRLL, &data);
+    data &= 0xFFFF0000;
+    data |= regs_cfg.divfracl;
+    RF_writeCtlReg(GE_SX_DIVNFRAC_CTRLL, data);
 }
 
 void RF_setGNSSMode(u32_t sys_indx)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(PS_GE_RX_CTRL3, &data);
-	data &= 0xFFFF1FFF;
-	data |= ((sys_indx & 0x7) << 13);
-	RF_writeCtlReg(PS_GE_RX_CTRL3, data);
+    RF_readCtlReg(PS_GE_RX_CTRL3, &data);
+    data &= 0xFFFF1FFF;
+    data |= ((sys_indx & 0x7) << 13);
+    RF_writeCtlReg(PS_GE_RX_CTRL3, data);
 
 }
 
 void RF_setADCclk(u32_t divRatio1, u32_t divRatio2)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(PS_GE_CLK_GEN_CTRL1, &data);
-	data &= 0xffffc3ff;
-	data |= ((divRatio1 & 0xF) << 10);
-	RF_writeCtlReg(PS_GE_CLK_GEN_CTRL1, data);
+    RF_readCtlReg(PS_GE_CLK_GEN_CTRL1, &data);
+    data &= 0xffffc3ff;
+    data |= ((divRatio1 & 0xF) << 10);
+    RF_writeCtlReg(PS_GE_CLK_GEN_CTRL1, data);
 
-	RF_readCtlReg(PS_GE_CLK_GEN_CTRL3, &data);
-	data &= 0xffffff9f;
-	data |= ((divRatio2 & 0x3) << 5);
-	RF_writeCtlReg(PS_GE_CLK_GEN_CTRL3, data);
+    RF_readCtlReg(PS_GE_CLK_GEN_CTRL3, &data);
+    data &= 0xffffff9f;
+    data |= ((divRatio2 & 0x3) << 5);
+    RF_writeCtlReg(PS_GE_CLK_GEN_CTRL3, data);
 
-	RF_readCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, &data);
-	data |= (BIT(12) | BIT(11));
-	RF_writeCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, data);
-	RF_readCtlReg(REG_PS_GE_CLK_GEN_CTRL0, &data);
-	data |= (BIT(12) | BIT(11));
-	RF_writeCtlReg(REG_PS_GE_CLK_GEN_CTRL0, data);
+    RF_readCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, &data);
+    data |= (BIT(12) | BIT(11));
+    RF_writeCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, data);
+    RF_readCtlReg(REG_PS_GE_CLK_GEN_CTRL0, &data);
+    data |= (BIT(12) | BIT(11));
+    RF_writeCtlReg(REG_PS_GE_CLK_GEN_CTRL0, data);
 
-	RF_readCtlReg(GE_CLK_GATE_CTRL, &data);
-	data |= BIT(14);
-	RF_writeCtlReg(GE_CLK_GATE_CTRL, data);
+    RF_readCtlReg(GE_CLK_GATE_CTRL, &data);
+    data |= BIT(14);
+    RF_writeCtlReg(GE_CLK_GATE_CTRL, data);
 }
 
 void RF_setPPclk(u32_t divRatio1, u32_t divRatio2)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(PS_GE_CLK_GEN_CTRL2, &data);
-	data &= 0xfffff87f;
-	data |= ((divRatio1 & 0xf) << 7);
-	RF_writeCtlReg(PS_GE_CLK_GEN_CTRL2, data);
+    RF_readCtlReg(PS_GE_CLK_GEN_CTRL2, &data);
+    data &= 0xfffff87f;
+    data |= ((divRatio1 & 0xf) << 7);
+    RF_writeCtlReg(PS_GE_CLK_GEN_CTRL2, data);
 
-	RF_readCtlReg(PS_GE_CLK_GEN_CTRL3, &data);
-	data &= 0xffffffe7;
-	data |= ((divRatio2 & 0x3) << 3);
-	RF_writeCtlReg(PS_GE_CLK_GEN_CTRL3, data);
+    RF_readCtlReg(PS_GE_CLK_GEN_CTRL3, &data);
+    data &= 0xffffffe7;
+    data |= ((divRatio2 & 0x3) << 3);
+    RF_writeCtlReg(PS_GE_CLK_GEN_CTRL3, data);
 
-	RF_readCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, &data);
-	data |= (BIT(8) | BIT(7));
-	RF_writeCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, data);
-	RF_readCtlReg(REG_PS_GE_CLK_GEN_CTRL0, &data);
-	data |= (BIT(8) | BIT(7));
-	RF_writeCtlReg(REG_PS_GE_CLK_GEN_CTRL0, data);
+    RF_readCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, &data);
+    data |= (BIT(8) | BIT(7));
+    RF_writeCtlReg(DEBUG_PS_GE_CLK_GEN_CTRL0, data);
+    RF_readCtlReg(REG_PS_GE_CLK_GEN_CTRL0, &data);
+    data |= (BIT(8) | BIT(7));
+    RF_writeCtlReg(REG_PS_GE_CLK_GEN_CTRL0, data);
 
-	RF_readCtlReg(GE_CLK_GATE_CTRL, &data);
-	data |= BIT(15);
-	RF_writeCtlReg(GE_CLK_GATE_CTRL, data);
+    RF_readCtlReg(GE_CLK_GATE_CTRL, &data);
+    data |= BIT(15);
+    RF_writeCtlReg(GE_CLK_GATE_CTRL, data);
 }
 
 void RF_setADCEnable(u32_t divRatio1, u32_t divRatio2)
 {
-	RF_setADCclk(divRatio1, divRatio2);
-	APB_ADC_ENABLE();
+    RF_setADCclk(divRatio1, divRatio2);
+    APB_ADC_ENABLE();
 }
 
 void RF_setPGAGain(u32_t gain)
 {
-	u32_t data;
+    u32_t data;
 
-	RF_readCtlReg(GE_RX_GAIN_CTRL0, &data);
-	data &= 0xffff0fff;
-	data |= ((gain & 0xf) << 12);
-	RF_writeCtlReg(GE_RX_GAIN_CTRL0, data);
+    RF_readCtlReg(GE_RX_GAIN_CTRL0, &data);
+    data &= 0xffff0fff;
+    data |= ((gain & 0xf) << 12);
+    RF_writeCtlReg(GE_RX_GAIN_CTRL0, data);
 }
 
 void RF_Control(s16_t RF_Mode)
 {
-	u32_t data_tmp;
+    u32_t data_tmp;
 
-	sci_reg_or(BIT_AON_APB_GNSS_RF_CTRL_GNSS_RF_CTRL_ADDR, BIT(1));
+    sci_reg_or(BIT_AON_APB_GNSS_RF_CTRL_GNSS_RF_CTRL_ADDR, BIT(1));
 
-	RF_softReset();
-	RF_setInterface();
-	RF_setSWCtrlFSMState();
-	RF_switchState(0);
-	DELAY(1);
+    RF_softReset();
+    RF_setInterface();
+    RF_setSWCtrlFSMState();
+    RF_switchState(0);
+    DELAY(1);
 
-	RF_writeCtlReg(GE_CHARGE_TIME1, 0x5000);
-	RF_writeCtlReg(GE_CHARGE_TIME2, 0x5000);
-	RF_writeCtlReg(GE_CHARGE_TIME3, 0x5000);
-	RF_writeCtlReg(GE_CHARGE_TIME4, 0x5000);
-	RF_writeCtlReg(GE_CHARGE_TIME5, 0x5000);
+    RF_writeCtlReg(GE_CHARGE_TIME1, 0x5000);
+    RF_writeCtlReg(GE_CHARGE_TIME2, 0x5000);
+    RF_writeCtlReg(GE_CHARGE_TIME3, 0x5000);
+    RF_writeCtlReg(GE_CHARGE_TIME4, 0x5000);
+    RF_writeCtlReg(GE_CHARGE_TIME5, 0x5000);
 
-	RF_switchState(1);
-	DELAY(70);
-	RF_switchState(2);
-	DELAY(1);
+    RF_switchState(1);
+    DELAY(70);
+    RF_switchState(2);
+    DELAY(1);
 
-	if ((sci_read32(BIT_AON_APB_REG_CGM_AUTO_EN_BB_REF_FREQ_SEL_ADDR) & BIT_AON_APB_REG_CGM_AUTO_EN_BB_REF_FREQ_SEL_ADDR_MASK) == 0) {
-		RF_setSXFreqDivRatio(g_RF_LO_FREQ[RF_Mode + RF_LO_FREQ_TABLE_CRYSTAL_OFFSET]);
-	} else {
-		RF_setSXFreqDivRatio(g_RF_LO_FREQ[RF_Mode]);
-	}
+    if ((sci_read32(BIT_AON_APB_REG_CGM_AUTO_EN_BB_REF_FREQ_SEL_ADDR) & BIT_AON_APB_REG_CGM_AUTO_EN_BB_REF_FREQ_SEL_ADDR_MASK) == 0) {
+        RF_setSXFreqDivRatio(g_RF_LO_FREQ[RF_Mode + RF_LO_FREQ_TABLE_CRYSTAL_OFFSET]);
+    } else {
+        RF_setSXFreqDivRatio(g_RF_LO_FREQ[RF_Mode]);
+    }
 
-	RF_switchState(3);
-	DELAY(5);
-	DELAY(200);
+    RF_switchState(3);
+    DELAY(5);
+    DELAY(200);
 
-	RF_switchState(4);
-	DELAY(1);
+    RF_switchState(4);
+    DELAY(1);
 
-	RF_setGNSSMode(RF_Mode);
-	RF_setADCEnable(9, 1);
-	RF_setPPclk(9, 1);
+    RF_setGNSSMode(RF_Mode);
+    RF_setADCEnable(9, 1);
+    RF_setPPclk(9, 1);
 
-	APB_SET_FAKE_CLK(2, 0);
+    APB_SET_FAKE_CLK(2, 0);
 
 #if 1
-	APB_SET_ARM_CLK(0);
-	APB_SET_APB_CLK(1);
-	APB_SET_BB_CLK(1);
-	APB_SET_AE_CLK(1);
+    APB_SET_ARM_CLK(0);
+    APB_SET_APB_CLK(1);
+    APB_SET_BB_CLK(1);
+    APB_SET_AE_CLK(1);
 
-	APB_GNSS_POWER_ON();
-	DELAY(1);
+    APB_GNSS_POWER_ON();
+    DELAY(1);
 
-	u32_t gnss_pwron_finish_flag = 0;
-	while (!gnss_pwron_finish_flag) {
-		gnss_pwron_finish_flag  = APB_GET_GNSS_POWERON_FINISH();
-		DELAY(1);
-	}
+    u32_t gnss_pwron_finish_flag = 0;
+    while (!gnss_pwron_finish_flag) {
+        gnss_pwron_finish_flag  = APB_GET_GNSS_POWERON_FINISH();
+        DELAY(1);
+    }
 
-	SYS_SET_GNSS_BB_EN(0XFFF);
+    SYS_SET_GNSS_BB_EN(0XFFF);
 
-	RF_readCtlReg(GE_RX_PGA_CBANK_CTRL0, &data_tmp);
-	data_tmp &= 0xffff0fff;
-	data_tmp |= 0x1 << 12;
-	data_tmp |= 0x1 << 14;
-	RF_writeCtlReg(GE_RX_PGA_CBANK_CTRL0, data_tmp);
+    RF_readCtlReg(GE_RX_PGA_CBANK_CTRL0, &data_tmp);
+    data_tmp &= 0xffff0fff;
+    data_tmp |= 0x1 << 12;
+    data_tmp |= 0x1 << 14;
+    RF_writeCtlReg(GE_RX_PGA_CBANK_CTRL0, data_tmp);
 
 #endif
 }
 
 void RF_CFG(void)
 {
-	s16_t rf_mode = 0;
+    s16_t rf_mode = 0;
 
-	rf_mode = RF_GPS_BD_GLO_MODE;
-	RF_Control(rf_mode);
+    rf_mode = RF_GPS_BD_GLO_MODE;
+    RF_Control(rf_mode);
 }
 
 void BB_RESET(void)
 {
-	u32_t regValue = 0x0;
+    u32_t regValue = 0x0;
 
-	regValue = sci_read32(SOFT_RST);
-	sci_write32(SOFT_RST, (regValue | 0x100000));
-	DELAY(1);
-	sci_write32(SOFT_RST, (regValue & 0xffefffff));
+    regValue = sci_read32(SOFT_RST);
+    sci_write32(SOFT_RST, (regValue | 0x100000));
+    DELAY(1);
+    sci_write32(SOFT_RST, (regValue & 0xffefffff));
 }
 
 void M4_CLK_CFG(void)
 {
-	sci_write32(GNSS_BB_EN, 0x4FF);
-	BB_RESET();
+    sci_write32(GNSS_BB_EN, 0x4FF);
+    BB_RESET();
 }
 
 void GNSS_Start(void)
 {
-	LOG_DBG("gnss init start");
-	RF_CFG();
+    LOG_DBG("gnss init start");
+    RF_CFG();
 
-	M4_CLK_CFG();
-	sci_reg_or(GNSS_BB_EN, BIT(4) | BIT(6) | BIT(7));
-	sci_reg_or(BB_DBG_CLK_CTRL, BIT(0));
-	sci_write32(DATA2RAM_CONF0_ADDR, 0x04000002);
-	LOG_DBG("gnss init done");
+    M4_CLK_CFG();
+    sci_reg_or(GNSS_BB_EN, BIT(4) | BIT(6) | BIT(7));
+    sci_reg_or(BB_DBG_CLK_CTRL, BIT(0));
+    sci_write32(DATA2RAM_CONF0_ADDR, 0x04000002);
+    LOG_DBG("gnss init done");
 }
