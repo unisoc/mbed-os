@@ -16,9 +16,10 @@
  */
 #include "console.h"
 
+extern void start_at(void);
 int main(void)
 {
-	console_init();
+    start_at();
     while(1);
     return 0;
 }
