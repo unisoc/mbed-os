@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <inttypes.h>
 #include <errno.h>
-#include <semaphore.h>
+//#include <semaphore.h>
 #include <string.h>
 #include <pthread.h>
 #include "uki_timer.h"

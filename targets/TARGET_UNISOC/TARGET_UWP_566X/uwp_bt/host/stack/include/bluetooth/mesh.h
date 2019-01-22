@@ -19,7 +19,7 @@
 #include <osi/uki_settings.h>
 #include <stddef.h>
 #include <errno.h>
-#include <semaphore.h>
+//#include <semaphore.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>

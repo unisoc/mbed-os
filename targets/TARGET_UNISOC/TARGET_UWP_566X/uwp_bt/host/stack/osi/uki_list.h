@@ -1,7 +1,7 @@
 #ifndef UKI_LIST_H_
 #define UKI_LIST_H_
 #include <pthread.h>
-#include <semaphore.h>
+//#include <semaphore.h>
 
 
 #ifdef __cplusplus

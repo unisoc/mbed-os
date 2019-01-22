@@ -26,7 +26,7 @@ extern "C" {
 #include <bluetooth/conn.h>
 #include <bluetooth/hci.h>
 
-#include <semaphore.h>
+//#include <semaphore.h>
 
 /* L2CAP header size, used for buffer size calculations */
 #define BT_L2CAP_HDR_SIZE               4

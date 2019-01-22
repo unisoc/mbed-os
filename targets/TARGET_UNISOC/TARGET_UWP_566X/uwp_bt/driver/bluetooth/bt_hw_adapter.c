@@ -8,8 +8,8 @@
 
 #include "bt_hw_adapter.h"
 
-#include "uwp_sipc.h"
-#include "uwp_sblock.h"
+#include "sipc.h"
+#include "sblock.h"
 
 #include "uki_abs.h"
 #include "uki_zif.h"

@@ -1,7 +1,7 @@
 #ifndef __BLUETOOTH_UKI_QUEUE_H
 #define __BLUETOOTH_UKI_QUEUE_H
 
-#include <semaphore.h>
+//#include <semaphore.h>
 #include "uki_utils.h"
 
 #include "uki_list.h"
