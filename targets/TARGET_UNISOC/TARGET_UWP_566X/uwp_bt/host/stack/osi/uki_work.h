@@ -8,7 +8,7 @@ extern "C" {
 
 #include <sys/types.h>
 #include <pthread.h>
-#include <semaphore.h>
+//#include <semaphore.h>
 #include <string.h>
 #include "uki_timer.h"
 #include "uki_list.h"

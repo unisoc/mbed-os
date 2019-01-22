@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <semaphore.h>
+//#include <semaphore.h>
 #include "osi/uki_queue.h"
 
 /* LL connection parameters */
