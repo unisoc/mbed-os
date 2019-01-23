@@ -89,6 +89,8 @@ struct cmd_get_cp_info {
 	struct trans_hdr trans_header;
 	u32_t version;
 	char mac[ETH_ALEN];
+    u8_t max_ap_assoc_sta_num;
+    u8_t max_ap_blacklist_sta_num;
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
@@ -116,12 +118,13 @@ struct cmd_start_ap {
 PACK_STRUCT_END
 	
 PACK_STRUCT_BEGIN
-struct cmd_del_station {
+struct cmd_del_sta {
+    struct trans_hdr trans_header;
 	/**
 	 * If mac set to FF:FF:FF:FF:FF:FF,
 	 * all station will be disconnected.
 	 */
-	u8_t mac[6];
+	u8_t mac[ETH_ALEN];
 	u16_t reason_code;
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
@@ -151,9 +154,9 @@ struct cmd_connect {
 	u8_t group_cipher;
 	u8_t key_mgmt;
 	u8_t mfp_enable;
-	u8_t passphrase_len;
+	u8_t psk_len;
 	u8_t ssid_len;
-	u8_t passphrase[MAX_KEY_LEN];
+	u8_t psk[MAX_KEY_LEN];
 	u8_t ssid[MAX_SSID_LEN];
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
@@ -178,19 +181,33 @@ struct cmd_set_ip {
 PACK_STRUCT_END
 
 PACK_STRUCT_BEGIN
+struct cmd_get_sta {
+    struct trans_hdr trans_header;
+    /**
+     * Response value
+     * Now needs signal only.
+     */
+    u8_t reserved[5];
+    s8_t signal;
+    u8_t reserved_1[6];
+} PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
+
+PACK_STRUCT_BEGIN
 struct cmd_npi {
-	struct trans_hdr trans_header;
-	u8_t data[0];
+    struct trans_hdr trans_header;
+    u8_t data[0];
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
 PACK_STRUCT_BEGIN
 struct event_scan_result {
-	u8_t band;
-	u8_t channel;
-	s8_t rssi;
-	char bssid[ETH_ALEN];
-	char ssid[MAX_SSID_LEN];
+    u8_t band;
+    u8_t channel;
+    s8_t rssi;
+    u8_t encrypt_mode;
+    char bssid[ETH_ALEN];
+    char ssid[MAX_SSID_LEN];
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
@@ -204,7 +221,9 @@ PACK_STRUCT_END
 
 PACK_STRUCT_BEGIN
 struct event_connect {
-	u8_t status;
+    u8_t status;
+    u8_t bssid[ETH_ALEN];
+    u8_t primary_chan_num;
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
@@ -217,19 +236,16 @@ PACK_STRUCT_END
 PACK_STRUCT_BEGIN
 struct event_new_station {
 	u8_t is_connect; /* 1 for connected, 0 for disconnected. */
-	u8_t mac[6];
+	u8_t mac[ETH_ALEN];
 	/* u16_t ie_len; */
 	/* u8_t ie[0]; */
 }PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 
-typedef 
-PACK_STRUCT_BEGIN
-struct{
+typedef struct{
     struct event_scan_result res;
     struct list_head res_list;
-}PACK_STRUCT_STRUCT scan_result_info_t;
-PACK_STRUCT_END
+}scan_result_info_t;
 
 /* int wifi_cmd_load_ini(u8_t *pAd); */
 /* int wifi_cmd_set_sta_connect_info(u8_t *pAd, char *ssid, char *key); */

@@ -224,10 +224,12 @@ int wifi_cmd_connect(struct wifi_device *wifi_dev,
 
 	cmd.channel = params->channel;
 	cmd.ssid_len = params->ssid_length;
-	cmd.passphrase_len = params->psk_length;
+	cmd.psk_len = params->psk_length;
 
 	memcpy(cmd.ssid, params->ssid, cmd.ssid_len);
-	memcpy(cmd.passphrase, params->psk, cmd.passphrase_len);
+	memcpy(cmd.psk, params->psk, cmd.psk_len);
+
+    DUMP_DATA(&cmd, sizeof(struct cmd_connect));
 
 	ret = wifi_cmd_send(WIFI_CMD_CONNECT, (char *)&cmd,
 			    sizeof(cmd), NULL, NULL);
@@ -260,11 +262,12 @@ int wifi_cmd_get_cp_info(struct wifi_priv *priv)
 {
 	struct cmd_get_cp_info cmd;
 	int ret;
-	int len;
+	int rlen;
 
 	memset(&cmd, 0, sizeof(cmd));
-	ret = wifi_cmd_send(WIFI_CMD_GET_CP_INFO, (char *)&cmd, sizeof(cmd),
-			    (char *)&cmd, &len);
+
+	ret = wifi_cmd_send(WIFI_CMD_GET_CP_INFO, (char *)&cmd,
+			sizeof(struct trans_hdr), (char *)&cmd, &rlen);
 	if (ret) {
 		LOG_ERR("Get cp info send cmd fail");
 		return ret;
@@ -278,7 +281,17 @@ int wifi_cmd_get_cp_info(struct wifi_priv *priv)
 	cmd.mac[4] ^= 0x80;
 	memcpy(priv->wifi_dev[WIFI_DEV_AP].mac, cmd.mac, ETH_ALEN);
 
-	printk("	CP version: 0x%x\n", priv->cp_version);
+	/* Store maximum station on softap. */
+	priv->wifi_dev[WIFI_DEV_AP].max_sta_num = cmd.max_ap_assoc_sta_num;
+
+	/* Store maximum stations in blacklist on softap. */
+	priv->wifi_dev[WIFI_DEV_AP].max_blacklist_num =
+		cmd.max_ap_blacklist_sta_num;
+
+	LOG_INF("CP version: 0x%x", priv->cp_version);
+
+	LOG_DBG("Max sta num: %d", cmd.max_ap_assoc_sta_num);
+	LOG_DBG("Max blacklist num: %d", cmd.max_ap_blacklist_sta_num);
 
 	return 0;
 }
@@ -483,6 +496,7 @@ static int wifi_evt_scan_result(struct wifi_device *wifi_dev,
     list_add_tail(&temp->res_list, &g_scan_list);
     scan_ap_cnt ++;
     LOG_DBG("scan malloc:%p", temp);
+    //LOG_DBG("%s %d %d",temp->res.ssid, temp->res.encrypt_mode, temp->res.rssi);
 
 	return 0;
 }

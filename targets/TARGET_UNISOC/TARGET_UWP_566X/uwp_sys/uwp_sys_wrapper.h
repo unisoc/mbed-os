@@ -88,6 +88,9 @@ static inline void __LIST_ADD(struct list_head *newlist,
     newlist->prev = prev;
 }
 
+#define LIST_FIND_ENTRY(ptr, container, member)  \
+    ((char *)ptr - (char *)&(((container *)0)->member))
+
 void list_add_tail(struct list_head *newlist, struct list_head *list);
 
 /* global variable for test */
