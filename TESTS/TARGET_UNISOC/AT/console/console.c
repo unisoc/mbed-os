@@ -6,7 +6,7 @@
 *****************************************************************************/
 #include "console.h"
 #include "serial_api.h"
-#include "at.h"
+#include "uwp_cmd_at.h"
 
 extern int stdio_uart_inited;
 extern serial_t stdio_uart;

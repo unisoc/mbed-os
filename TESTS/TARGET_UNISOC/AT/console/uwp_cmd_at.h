@@ -1,7 +1,7 @@
-#ifndef _AT_H_
-#define _AT_H_
+#ifndef __UWP_CMD_AT_H_
+#define __UWP_CMD_AT_H_
 
-//#define RDA_AT_DEBUG
+#define RDA_AT_DEBUG
 #ifdef RDA_AT_DEBUG
 #define RDA_AT_PRINT(fmt, ...) do {\
             printf(fmt, ##__VA_ARGS__);\
