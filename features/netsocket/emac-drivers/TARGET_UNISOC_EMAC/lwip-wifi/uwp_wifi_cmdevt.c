@@ -9,6 +9,7 @@
 #include "mbed_retarget.h"
 #include "uwp_wifi_cmdevt.h"
 #include "uwp_netif.h"
+#include "uwp_psk.h"
 
 //#define WIFI_LOG_DBG
 //#define WIFI_DUMP
@@ -214,6 +215,7 @@ int wifi_cmd_connect(struct wifi_device *wifi_dev,
 {
 	int ret;
 	struct cmd_connect cmd;
+	u8_t wpa_psk[WIFI_PMK_LEN] = {0};
 
 	memset(&cmd, 0, sizeof(cmd));
 
@@ -221,13 +223,22 @@ int wifi_cmd_connect(struct wifi_device *wifi_dev,
 		LOG_ERR("Invalid SSID.");
 		return -EINVAL;
 	}
+	if (params->psk_length && params->psk) {
+		ret = pbkdf2_sha1(params->psk, params->ssid, WIFI_PMK_ITER,
+			wpa_psk, WIFI_PMK_LEN);
+		if (ret) {
+			LOG_ERR("failed to calculate PSK! %d\n", ret);
+			return ret;
+		}
+	}
 
 	cmd.channel = params->channel;
 	cmd.ssid_len = params->ssid_length;
-	cmd.psk_len = params->psk_length;
+	cmd.psk_len = params->psk_length? WIFI_PMK_LEN:0;
 
 	memcpy(cmd.ssid, params->ssid, cmd.ssid_len);
-	memcpy(cmd.psk, params->psk, cmd.psk_len);
+	if (params->psk_length && params->psk)
+		memcpy(cmd.psk, wpa_psk, WIFI_PMK_LEN);
 
     DUMP_DATA(&cmd, sizeof(struct cmd_connect));
 
