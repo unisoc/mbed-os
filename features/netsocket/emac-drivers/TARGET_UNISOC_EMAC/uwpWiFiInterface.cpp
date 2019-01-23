@@ -19,6 +19,7 @@
 #include "nsapi_types.h"
 #include "uwp_emac.h"
 #include "uwp_wifi_cmdevt.h"
+#include "uwp_wifi_api.h"
 
 /* Interface implementation */
 //WiFiInterface::WiFiInterface(EMAC &emac, OnboardNetworkStack &stack) :
@@ -264,7 +265,7 @@ nsapi_size_or_error_t UWPWiFiInterface::scan(WiFiAccessPoint *res, nsapi_size_t 
     memset(bss, 0, ret * sizeof(struct event_scan_result));
     uwp_mgmt_get_scan_result(bss, ret);
     for(int i=0; i<ret; i++){
-        printf("ssid:%-36s   rssi:%d\r\n",bss[i].ssid, bss[i].rssi);
+        printf("%-32s    %-10s    %-2d\r\n",bss[i].ssid, security2str(bss[i].encrypt_mode), bss[i].rssi);
     }
     free(bss);
     return 0;

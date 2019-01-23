@@ -17,8 +17,9 @@ extern "C" {
 #endif
 
 enum wifi_security_type {
-	WIFI_SECURITY_TYPE_NONE = 0,
-	WIFI_SECURITY_TYPE_PSK,
+    WIFI_SECURITY_TYPE_OPEN = 1,
+    WIFI_SECURITY_TYPE_PSK,
+    WIFI_SECURITY_OTHERS,
 };
 
 #define NET_LINK_ADDR_MAX_LENGTH 6

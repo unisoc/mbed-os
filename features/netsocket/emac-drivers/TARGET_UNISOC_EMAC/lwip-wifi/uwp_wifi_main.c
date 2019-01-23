@@ -14,7 +14,7 @@
 #include "uwp_wifi_drv.h"
 #include "uwp_wifi_txrx.h"
 
-//#define WIFI_LOG_DBG
+#define WIFI_LOG_DBG
 //#define WIFI_DUMP
 #include "uwp_log.h"
 
@@ -715,8 +715,7 @@ int uwp_mgmt_get_scan_result(void *buf, int num){
 
     p_node = p_head->next;
     while((p_node != p_head) && (cnt <= num)){
-        memcpy(&data[cnt], (void *)(((uint32_t)p_node) - sizeof(struct event_scan_result)),
-                        sizeof(struct event_scan_result));
+        memcpy(&data[cnt], (void *)LIST_FIND_ENTRY(p_node, scan_result_info_t, res_list), sizeof(struct event_scan_result));
         p_node = p_node->next;
         cnt ++;
     }
@@ -727,12 +726,13 @@ int uwp_mgmt_get_scan_result(void *buf, int num){
         p_node->prev->next = p_node->next;
         p_del = p_node;
         p_node = p_node->next;
-        LOG_DBG("free scan:%x",(((uint32_t)p_del) - sizeof(struct event_scan_result)));
-        free((void *)(((uint32_t)p_del) - sizeof(struct event_scan_result)));
+        LOG_DBG("scan free:%p",LIST_FIND_ENTRY(p_del, scan_result_info_t, res_list));
+        free((void *)LIST_FIND_ENTRY(p_del, scan_result_info_t, res_list));
     }
 
     return cnt;
 }
+
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel)
 {
     struct wifi_drv_connect_params para;
