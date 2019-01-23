@@ -18,8 +18,9 @@
 //#define WIFI_DUMP
 #include "uwp_log.h"
 
-#define RX_BUF_SIZE (2000)
-#define TXRX_STACK_SIZE (1024)
+#define RX_DATA_SIZE (2000)
+#define RX_CMDEVT_SIZE (512)
+#define RX_STACK_SIZE (1024)
 
 #define wifi_buf_slist_init(list) sys_slist_init(list)
 #define wifi_buf_slist_append(list, buf) net_buf_slist_put(list, buf)
@@ -30,8 +31,10 @@
 #define wifi_slist_t sys_slist_t
 
 static void *event_sem = NULL;
+static void *data_sem = NULL;
 static void *rx_buf_mutex = NULL;
-static u8_t rx_buf[RX_BUF_SIZE];
+static u8_t rx_data_buf[RX_DATA_SIZE];
+static u8_t rx_cmdevt_buf[RX_CMDEVT_SIZE];
 static wifi_slist_t rx_buf_list;
 extern void *packet_rx_queue;
 
@@ -401,7 +404,7 @@ static void wifi_rx_data(int ch)
         LOG_ERR("Invalid data channel: %d.", ch);
     }
 
-    k_sem_release(event_sem);
+    k_sem_release(data_sem);
 }
 
 int wifi_tx_cmd(void *data, int len)
@@ -440,7 +443,7 @@ int wifi_tx_data(void *data, int len)
 
     return 0;
 }
-
+#if 0
 static void txrx_thread(const char*p1)
 {
     int ret;
@@ -480,12 +483,64 @@ static void txrx_thread(const char*p1)
         }
     }
 }
+#endif
+static void rx_data_thread(const char*p1)
+{
+    int ret;
+    struct wifi_priv *priv = (struct wifi_priv *)p1;
+    u8_t *addr = rx_data_buf;
+    int len;
+
+    while (1) {
+        LOG_DBG("Wait for data.");
+        k_sem_acquire(data_sem, K_FOREVER);
+
+        while (1) {
+            memset(addr, 0, RX_DATA_SIZE);
+            ret = wifi_ipc_recv(SMSG_CH_WIFI_DATA_NOR,
+                    addr, &len, 0);
+            if (ret == 0) {
+                LOG_DBG("Receive data %p len %i",
+                        addr, len);
+                wifi_data_process(priv, addr, len);
+            } else {
+                break;
+            }
+        }
+    }
+}
+static void rx_cmdevt_thread(const char*p1)
+{
+    int ret;
+    struct wifi_priv *priv = (struct wifi_priv *)p1;
+    u8_t *addr = rx_cmdevt_buf;
+    int len;
+
+    while (1) {
+        LOG_DBG("Wait for cmdevt.");
+        k_sem_acquire(event_sem, K_FOREVER);
+
+        while (1) {
+            memset(addr, 0, RX_CMDEVT_SIZE);
+            ret = wifi_ipc_recv(SMSG_CH_WIFI_CTRL,
+                    addr, &len, 0);
+            if (ret == 0) {
+                LOG_DBG("Receive cmd/evt %p len %i",
+                    addr, len);
+                wifi_cmdevt_process(priv, addr, len);
+            } else {
+                break;
+            }
+        }
+    }
+}
 
 int wifi_txrx_init(struct wifi_priv *priv)
 {
     int ret = 0;
 
     event_sem = k_sem_create(1, 0);
+    data_sem = k_sem_create(1, 0);
     rx_buf_mutex = k_mutex_create();
 
     wifi_buf_slist_init(&rx_buf_list);
@@ -511,7 +566,8 @@ int wifi_txrx_init(struct wifi_priv *priv)
         return ret;
     }
 
-    k_thread_create("txrx_thread",txrx_thread,(void *)priv,NULL,TXRX_STACK_SIZE * 2,osPriorityNormal);
+    k_thread_create("rx_cmdevt_thread", rx_cmdevt_thread, (void *)priv, NULL, RX_STACK_SIZE, osPriorityNormal);
+    k_thread_create("rx_data_thread", rx_data_thread, (void *)priv, NULL, RX_STACK_SIZE, osPriorityNormal);
 
 /*
 	k_thread_create(&txrx_thread_data, txrx_stack,
