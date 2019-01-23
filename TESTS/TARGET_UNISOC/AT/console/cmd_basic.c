@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "rda_console.h"
-#include "at.h"
+#include "uwp_cmd_at.h"
 
 static int isdigit(unsigned char c)
 {

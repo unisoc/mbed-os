@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "at.h"
+#include "uwp_cmd_at.h"
 #include "console.h"
 #include "uwpWiFiInterface.h"
 
@@ -18,6 +18,7 @@ int conn(char *ssid, char *pw, char *bssid)
 	const char *ip_addr;
 	ret = wifi.init();
 	if(ret != NSAPI_ERROR_OK){
+        RDA_AT_PRINT("wifi init failed\r\n");
         return -1;
     }
     wifi.scan(&res,1);
@@ -42,13 +43,13 @@ int do_wsconn( cmd_tbl_t *cmd, int argc, char *argv[])
 
     if (argc < 1) {
         RESP_ERROR(ERROR_ARG);
-        return 0;
+        return ERROR_ARG;
     }
 
     if(conn_flag == 1){
         RESP_ERROR(ERROR_ABORT);
         RDA_AT_PRINT("error! Has been connected!");
-        return 0;
+        return ERROR_ABORT;
     }
 
     memset(ssid, 0, sizeof(ssid));
@@ -62,9 +63,9 @@ int do_wsconn( cmd_tbl_t *cmd, int argc, char *argv[])
 
     if (strlen(ssid) == 0) {
         RESP_ERROR(ERROR_ARG);
-        return 0;
+        return ERROR_ARG;
     }
-	printf("ssid %s pw %s\r\n", ssid, pw);
+
     RDA_AT_PRINT("ssid %s pw %s\r\n", ssid, pw);
 
     ret = conn(ssid, pw, NULL);

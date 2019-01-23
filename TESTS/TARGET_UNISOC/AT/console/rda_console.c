@@ -10,7 +10,7 @@
 #include <string.h>
 #include "critical.h"
 #include "rda_console.h"
-#include "at.h"
+#include "uwp_cmd_at.h"
 
 #if  !defined ( __STATIC_INLINE )
 #if   defined ( __CC_ARM )

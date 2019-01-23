@@ -20,7 +20,9 @@ extern void start_at(void);
 int main(void)
 {
     start_at();
-    while(1);
+    while(1){
+        osDelay(100);
+    }
     return 0;
 }
 
