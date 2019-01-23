@@ -20,11 +20,11 @@
 #include "ipi.h"
 
 /* This function is called after RAM initialization and before main. */
-extern int uwp_flash_init(struct spi_flash_struct *dev);
+extern int uwp_flash_init(void);
+
 void mbed_sdk_init(void){
-    struct spi_flash_struct flash_test;
     uwp_cache_init();
-    uwp_flash_init(&flash_test);
+    uwp_flash_init();
     intc_uwp_init();
     aon_intc_uwp_init();
 }

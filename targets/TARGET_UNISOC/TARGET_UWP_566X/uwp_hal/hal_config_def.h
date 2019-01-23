@@ -1,0 +1,6 @@
+#ifndef __HAL_CONFIG_DEF_H
+#define __HAL_CONFIG_DEF_H
+
+#define CONFIG_FLASH_BASE_ADDRESS UWP_FLASH_BASE
+
+#endif

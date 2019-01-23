@@ -5,6 +5,7 @@
  */
 
 #include "hal_sfc.h"
+#include "hal_config_def.h"
 
 #define FLASH_WRITE_BLOCK_SIZE 0x1
 
@@ -118,6 +119,25 @@ static const struct flash_driver_api flash_uwp_api = {
 };
 #endif
 
+static struct spi_flash_struct uwp_flash_dev;
+#if 0
+static int flash_uwp_read(struct device *dev, off_t offset, void *data,
+			    size_t len)
+{
+	int ret = 0;
+	struct flash_uwp_config *cfg = DEV_CFG(dev);
+	struct spi_flash *flash = &(cfg->flash);
+
+	if (!len) {
+		return 0;
+	}
+
+	ret = flash->read(flash, ((u32_t)CONFIG_FLASH_BASE_ADDRESS + offset),
+		(u32_t *)data, len, READ_SPI_FAST);
+
+	return ret;
+}
+#endif
 int uwp_flash_init(struct spi_flash_struct *dev)
 {
     int ret = 0;

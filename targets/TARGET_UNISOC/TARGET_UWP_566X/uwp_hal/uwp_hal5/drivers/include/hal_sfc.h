@@ -144,6 +144,20 @@ extern "C" {
 
 	void uwp_spi_dump(u32_t arg_in);
 
+static inline unsigned int irq_lock_primask(void){
+    unsigned int key;
+    key = __get_PRIMASK();
+    __disable_irq();
+    return key;
+}
+
+static inline void irq_unlock_primask(unsigned int key){
+    if(key)
+        return;
+    __enable_irq();
+}
+
+#if 0
 static inline unsigned int irq_lock_primask(void)
 {
 
@@ -165,6 +179,7 @@ static inline void irq_unlock_primask(unsigned int key)
 	}
 	__asm__ volatile("cpsie i" : : : "memory");
 }
+#endif
 
 #ifdef __cplusplus
 }
