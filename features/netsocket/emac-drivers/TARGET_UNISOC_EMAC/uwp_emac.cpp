@@ -9,6 +9,7 @@
 #include "sipc.h"
 #include "ipi.h"
 #include "uwp_sys_wrapper.h"
+#include "uwp_buf_mgmt.h"
 
 
 // TODO:need confirm
@@ -203,7 +204,7 @@ void UWP_EMAC::packet_rx()
                 //rda_sem_release((void*)msg->arg3);
                 if (p) {
                     //printf("free RXBUFF:%p\r\n",msg->arg1-msg->arg3);
-                    free((void *)(msg->arg1 - msg->arg3));
+                    uwp_pkt_buf_free((void *)(msg->arg1-msg->arg3));
                     emac_link_input_cb(p);
                 }
                 break;

@@ -92,6 +92,7 @@ static inline void __LIST_ADD(struct list_head *newlist,
     ((char *)ptr - (char *)&(((container *)0)->member))
 
 void list_add_tail(struct list_head *newlist, struct list_head *list);
+int list_del_node(struct list_head *node, struct list_head *list);
 
 /* global variable for test */
 //extern void *sys_sem;

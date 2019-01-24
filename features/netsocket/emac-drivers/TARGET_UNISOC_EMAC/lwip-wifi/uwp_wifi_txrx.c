@@ -13,6 +13,7 @@
 #include "sipc.h"
 #include "uwp_sys_wrapper.h"
 #include "mbed_retarget.h"
+#include "uwp_buf_mgmt.h"
 
 //#define WIFI_LOG_DBG
 //#define WIFI_DUMP
@@ -106,7 +107,7 @@ int wifi_rx_complete_handle(struct wifi_priv *priv, void *data, int len)
 
     /* Allocate new empty buffer to cp. */
     LOG_DBG("notify cp:%d\r\n",i);
-    ret = impl_empty_buf(i);
+    ret = wifi_tx_empty_buf(i);
 
     return ret;
 }
@@ -250,11 +251,12 @@ static void wifi_rx_data(int ch)
 
 	k_sem_give(&event_sem);
 }
+#endif
 
 static int wifi_tx_empty_buf_(int num)
 {
 	int i;
-	struct net_buf *pkt_buf;
+	void *pkt_buf = NULL;
 	struct rx_empty_buff buf;
 	int ret;
 	u32_t data_ptr;
@@ -263,19 +265,13 @@ static int wifi_tx_empty_buf_(int num)
 
 	for (i = 0; i < num; i++) {
 		/* Reserve a data frag to receive the frame */
-		pkt_buf = net_pkt_get_reserve_rx_data(0, K_NO_WAIT);
+		pkt_buf = uwp_pkt_buf_get();
 		if (!pkt_buf) {
 			LOG_ERR("Could not allocate rx buf %d.", i);
-			return -ENOMEM;
+			break;
 		}
 
-		k_mutex_lock(&rx_buf_mutex, K_FOREVER);
-		wifi_buf_slist_append(&rx_buf_list, pkt_buf);
-		k_mutex_unlock(&rx_buf_mutex);
-
-		data_ptr = (u32_t)pkt_buf->data;
-		uwp_save_addr_before_payload((u32_t)data_ptr,
-				(void *)pkt_buf);
+		data_ptr = (u32_t)pkt_buf;
 
 		SPRD_AP_TO_CP_ADDR(data_ptr);
 		memcpy(&(buf.addr[i][0]), &data_ptr, 4);
@@ -335,6 +331,7 @@ int wifi_tx_empty_buf(int num)
 	return 0;
 }
 
+#if 0
 int wifi_release_rx_buf(void)
 {
 	struct net_buf *buf = NULL;
@@ -543,7 +540,8 @@ int wifi_txrx_init(struct wifi_priv *priv)
     data_sem = k_sem_create(1, 0);
     rx_buf_mutex = k_mutex_create();
 
-    wifi_buf_slist_init(&rx_buf_list);
+    //wifi_buf_slist_init(&rx_buf_list);
+    uwp_pkt_buf_init();
 
     ret = wifi_ipc_create_channel(SMSG_CH_WIFI_CTRL,
                       wifi_rx_event);

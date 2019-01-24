@@ -14,7 +14,7 @@
 #include "uwp_wifi_drv.h"
 #include "uwp_wifi_txrx.h"
 
-#define WIFI_LOG_DBG
+//#define WIFI_LOG_DBG
 //#define WIFI_DUMP
 #include "uwp_log.h"
 
@@ -653,7 +653,6 @@ int uwp_cp_init(void){
     return ret;
 }
 
-extern int impl_empty_buf(int num);
 int uwp_mgmt_open(void){
     int ret = -1;
     int i;
@@ -672,11 +671,9 @@ int uwp_mgmt_open(void){
 
     ret = wifi_cmd_open(&(uwp_wifi_dev.wifi_dev[0]));
     if(ret == 0){
-        for(i = 0; i < 10; i ++){
-            ret = impl_empty_buf(1);
-            if(ret != 0)
-                break;
-        }
+        ret = wifi_tx_empty_buf(TOTAL_RX_ADDR_NUM);
+        if(ret)
+            printf("notify cp error: %d\r\n", ret);
     }
     uwp_wifi_dev.wifi_dev[0].opened = true;
     return ret;
