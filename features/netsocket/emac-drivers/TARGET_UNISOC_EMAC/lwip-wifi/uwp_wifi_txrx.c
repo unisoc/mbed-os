@@ -541,7 +541,7 @@ int wifi_txrx_init(struct wifi_priv *priv)
     int ret = 0;
 
     event_sem = k_sem_create(1, 0);
-    data_sem = k_sem_create(1, 0);
+    data_sem = k_sem_create(15, 0);
     rx_buf_mutex = k_mutex_create();
 
     //wifi_buf_slist_init(&rx_buf_list);
