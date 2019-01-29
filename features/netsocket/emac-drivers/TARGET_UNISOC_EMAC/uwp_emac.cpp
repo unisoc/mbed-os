@@ -47,6 +47,7 @@ bool UWP_EMAC::link_out(emac_mem_buf_t *buf)
 
     u32_t actual_txlen = 0;
     u8_t *data;
+    u8_t *pos;
 	//struct pbuf *p_init = (struct pbuf *)buf;
     LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output enter, p:%08x\n", p));
 
@@ -55,6 +56,8 @@ bool UWP_EMAC::link_out(emac_mem_buf_t *buf)
 #endif
 
     data = (u8_t *)malloc(1530);
+    pos = data+16;
+
     //printf("TXBUFF:%p\r\n",data);
 
     if(data == NULL){
@@ -68,8 +71,9 @@ bool UWP_EMAC::link_out(emac_mem_buf_t *buf)
         /* Send the data from the pbuf to the interface, one pbuf at a
            time. The size of the data in each pbuf is kept in the ->len
            variable. */
-        memcpy(data+16, memory_manager->get_ptr(q), memory_manager->get_len(q));//reserve wid header length
+        memcpy(pos, memory_manager->get_ptr(q), memory_manager->get_len(q));//reserve wid header length
         actual_txlen += memory_manager->get_len(q);
+        pos += memory_manager->get_len(q);
         if(actual_txlen > 1514 || actual_txlen > memory_manager->get_total_len(p))
         {
             LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output err, actual_txlen:%d, tot_len%d\n", actual_txlen, memory_manager->get_total_len(p)));
