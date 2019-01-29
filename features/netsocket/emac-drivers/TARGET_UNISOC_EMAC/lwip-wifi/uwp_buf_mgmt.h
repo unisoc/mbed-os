@@ -8,6 +8,9 @@ extern "C"{
 #include "uwp_sys_wrapper.h"
 #include "hal_config_def.h"
 
+extern int wifi_rx_employ_num;
+extern int wifi_rx_free_num;
+
 typedef struct{
     void *buf;
     struct list_head list;

@@ -7,6 +7,8 @@
 static char wifi_reserve_ram[CONFIG_UWP_PKT_BUF_MAX * CONFIG_UWP_PKT_BUF_SIZE];
 static struct list_head wifi_buf_list_employ;
 static struct list_head wifi_buf_list_free;
+int wifi_rx_employ_num = 0;
+int wifi_rx_free_num = CONFIG_UWP_PKT_BUF_MAX;
 static void *wifi_list_mutex = NULL;
 
 int uwp_pkt_buf_init(void){
@@ -63,8 +65,9 @@ void *uwp_pkt_buf_get(void){
         LOG_DBG("get pkt buf error:%d", ret);
         return NULL;
 	}
-
+    wifi_rx_free_num --;
     list_add_tail(p_node, p_head_employ);
+    wifi_rx_employ_num ++;
     k_mutex_unlock(wifi_list_mutex);
 
     LOG_DBG("GET BUF:%p", ((uwp_pkt_buf *)LIST_FIND_ENTRY(p_node, uwp_pkt_buf, list))->buf);
@@ -91,8 +94,9 @@ int uwp_pkt_buf_free(void *buf){
         k_mutex_unlock(wifi_list_mutex);
         return ret;
 	}
-
+    wifi_rx_employ_num --;
     list_add_tail(p_del, p_head_free);
+    wifi_rx_free_num ++;
     //LOG_DBG("FREE BUF:%p", buf);
     k_mutex_unlock(wifi_list_mutex);
 
