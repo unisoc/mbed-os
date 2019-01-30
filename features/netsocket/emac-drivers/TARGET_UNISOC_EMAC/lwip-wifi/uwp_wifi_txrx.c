@@ -107,6 +107,10 @@ int wifi_rx_complete_handle(struct wifi_priv *priv, void *data, int len)
 
     /* Allocate new empty buffer to cp. */
     LOG_DBG("notify cp:%d\r\n",i);
+    if(wifi_rx_free_num > i) {
+        LOG_DBG("wifi_rx_free_num(%d) > i(%d)!!!\r\n",wifi_rx_free_num,i);
+        i = wifi_rx_free_num;
+    }
     ret = wifi_tx_empty_buf(i);
 
     return ret;
@@ -267,7 +271,7 @@ static int wifi_tx_empty_buf_(int num)
 		/* Reserve a data frag to receive the frame */
 		pkt_buf = uwp_pkt_buf_get();
 		if (!pkt_buf) {
-			LOG_ERR("Could not allocate rx buf %d.", i);
+			LOG_DBG("Could not allocate rx buf %d.", i);
 			break;
 		}
 
@@ -278,7 +282,7 @@ static int wifi_tx_empty_buf_(int num)
 	}
 
 	if (i == 0) {
-		LOG_ERR("No more rx packet buffer.");
+		LOG_DBG("No more rx packet buffer.");
 		return -EINVAL;
 	}
 
@@ -537,7 +541,7 @@ int wifi_txrx_init(struct wifi_priv *priv)
     int ret = 0;
 
     event_sem = k_sem_create(1, 0);
-    data_sem = k_sem_create(1, 0);
+    data_sem = k_sem_create(15, 0);
     rx_buf_mutex = k_mutex_create();
 
     //wifi_buf_slist_init(&rx_buf_list);

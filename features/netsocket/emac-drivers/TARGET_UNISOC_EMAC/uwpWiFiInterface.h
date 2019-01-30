@@ -45,8 +45,9 @@ class UWPWiFiInterface : public EMACInterface, public WiFiInterface
                 EMAC &emac = EMAC::get_default_instance(),
                 OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance()) : EMACInterface(emac, stack) {
                 _ssid[0] = '\0';
-				_pass[0] = '\0';
-				_channel = -1;
+                _pass[0] = '\0';
+                _channel = 0;
+                _security = NSAPI_SECURITY_NONE;
         }
 
         //static RDAWiFiInterface *get_target_default_instance();
