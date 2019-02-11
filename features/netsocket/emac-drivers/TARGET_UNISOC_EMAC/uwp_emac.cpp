@@ -7,7 +7,6 @@
 #include "uwp_emac.h"
 #include "uwp_wifi_main.h"
 #include "sipc.h"
-#include "ipi.h"
 #include "uwp_sys_wrapper.h"
 #include "uwp_buf_mgmt.h"
 
@@ -234,11 +233,14 @@ void UWP_EMAC::thread_function(void *pvParameters)
 
 bool UWP_EMAC::power_up()
 {
-    int ret;
+    static int thread_inited = 0;
     printf("%s\r\n",__func__);
-	ret = uwp_cp_init();
-    k_thread_create("packet_rx", UWP_EMAC::thread_function, this, NULL, DEFAULT_THREAD_STACKSIZE*5, PHY_PRIORITY);
-    return (ret == 0);
+    if(!thread_inited){
+        void *ret = k_thread_create("packet_rx", UWP_EMAC::thread_function, this, NULL, DEFAULT_THREAD_STACKSIZE*5, PHY_PRIORITY);
+        thread_inited = 1;
+        return (ret != NULL);
+    }
+    return true;
 }
 
 uint32_t UWP_EMAC::get_mtu_size() const

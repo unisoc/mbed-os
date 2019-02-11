@@ -19,6 +19,7 @@
 extern void start_at(void);
 int main(void)
 {
+    printf("main test ...\r\n");
     start_at();
     while(1){
         osDelay(100);

@@ -170,33 +170,6 @@ void sprd_bt_irq_disable(void)
 	NVIC_DisableIRQ(BT_ACCELERATOR_INTR4_IRQn);
 }
 
-/*wifi irq register enable request dis*/
-void sprd_wifi_irq_enable(void)
-{
-	NVIC_EnableIRQ(MAC_IRQn);
-	NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
-	NVIC_EnableIRQ(DPD_IRQn);
-	NVIC_EnableIRQ(COMTMR_IRQn);
-}
-
-void sprd_wifi_irq_disable(void)
-{
-	NVIC_DisableIRQ(MAC_IRQn);
-	NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
-	NVIC_DisableIRQ(DPD_IRQn);
-	NVIC_DisableIRQ(COMTMR_IRQn);
-}
-
-// TODO: parameter arg mean ???
-static void wifi_aon_irq_handler(int ch, void *arg)
-{
-    struct smsg msg;
-    s32_t irq = (s32_t)AON_IRQn;
-
-    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, (irq + 50));
-    smsg_send_irq(SIPC_ID_AP, &msg);
-}
-
 static void wifi_mac_irq_handler(void)
 {
 
@@ -205,18 +178,8 @@ static void wifi_mac_irq_handler(void)
     NVIC_DisableIRQ(MAC_IRQn);
     smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
     smsg_send_irq(SIPC_ID_AP, &msg);
+    LOG_DBG("mac irq\r\n");
     NVIC_EnableIRQ(MAC_IRQn);
-}
-
-static void wifi_cap_irq_handler(void)
-{
-
-    struct smsg msg;
-    s32_t irq = (s32_t)REQ_WIFI_CAP_IRQn;
-    NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
-    smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
-    smsg_send_irq(SIPC_ID_AP, &msg);
-    NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
 }
 
 static void wifi_dpd_irq_handler(void)
@@ -226,6 +189,7 @@ static void wifi_dpd_irq_handler(void)
     NVIC_DisableIRQ(DPD_IRQn);
     smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
     smsg_send_irq(SIPC_ID_AP, &msg);
+    LOG_DBG("dpd irq\r\n");
     NVIC_EnableIRQ(DPD_IRQn);
 }
 
@@ -234,9 +198,9 @@ static void wifi_comtmr_irq_handler(void)
     struct smsg msg;
     s32_t irq = (s32_t)COMTMR_IRQn;
     NVIC_DisableIRQ(COMTMR_IRQn);
-    LOG_DBG("%s\r\n",__func__);
     smsg_set(&msg, SMSG_CH_IRQ_DIS, SMSG_TYPE_EVENT, 0, irq);
     smsg_send_irq(SIPC_ID_AP, &msg);
+    LOG_DBG("comtmr irq\r\n");
     NVIC_EnableIRQ(COMTMR_IRQn);
 }
 
@@ -246,23 +210,13 @@ void wifi_irq_init(void)
     NVIC_SetVector(MAC_IRQn,(uint32_t)wifi_mac_irq_handler);
     NVIC_SetPriority(MAC_IRQn,0x1FUL);
 
-    NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
-    NVIC_SetVector(REQ_WIFI_CAP_IRQn,(uint32_t)wifi_cap_irq_handler);
-    NVIC_SetPriority(REQ_WIFI_CAP_IRQn,0x1FUL);
-
     NVIC_DisableIRQ(DPD_IRQn);
     NVIC_SetVector(DPD_IRQn,(uint32_t)wifi_dpd_irq_handler);
     NVIC_SetPriority(DPD_IRQn,0x1FUL);
 
-    LOG_INF("init irq num:%d",COMTMR_IRQn);
     NVIC_DisableIRQ(COMTMR_IRQn);
     NVIC_SetVector(COMTMR_IRQn,(uint32_t)wifi_comtmr_irq_handler);
     NVIC_SetPriority(COMTMR_IRQn,0x1FUL);
-    /* COMTMR open request before init so enable here */
-    NVIC_EnableIRQ(COMTMR_IRQn);
-
-    uwp_aon_intc_set_irq_callback(AON_INT_IRQ_REQ_BB_TS,
-        wifi_aon_irq_handler, (void *)AON_INT_IRQ_REQ_BB_TS);
 }
 
 void sprd_wifi_irq_enable_num(u32_t num)
@@ -275,9 +229,6 @@ void sprd_wifi_irq_enable_num(u32_t num)
         break;
     case COMTMR_IRQn:
         NVIC_EnableIRQ(COMTMR_IRQn);
-        break;
-    case REQ_WIFI_CAP_IRQn:
-        NVIC_EnableIRQ(REQ_WIFI_CAP_IRQn);
         break;
     case DPD_IRQn:
         NVIC_EnableIRQ(DPD_IRQn);
@@ -297,9 +248,6 @@ void sprd_wifi_irq_disable_num(u32_t num)
 	break;
 	case COMTMR_IRQn:
 		NVIC_DisableIRQ(COMTMR_IRQn);
-	break;
-	case REQ_WIFI_CAP_IRQn:
-		NVIC_DisableIRQ(REQ_WIFI_CAP_IRQn);
 	break;
 	case DPD_IRQn:
 		NVIC_DisableIRQ(DPD_IRQn);
@@ -491,7 +439,7 @@ static void bt_masked_accelerator_intr4_handler(void){
     NVIC_EnableIRQ(BT_ACCELERATOR_INTR4_IRQn);
 }
 
-int sprd_bt_irq_init(void)
+void sprd_bt_irq_init(void)
 {
     NVIC_DisableIRQ(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn);
     NVIC_SetVector(BT_MASKED_PAGE_TIMEOUT_INTR_IRQn,(uint32_t)bt_masked_page_timeout_handler);
@@ -554,8 +502,6 @@ int sprd_bt_irq_init(void)
     NVIC_SetPriority(BT_ACCELERATOR_INTR4_IRQn,0x1FUL);
 
 	sprd_bt_irq_enable();
-
-	return 0;
 }
 
 

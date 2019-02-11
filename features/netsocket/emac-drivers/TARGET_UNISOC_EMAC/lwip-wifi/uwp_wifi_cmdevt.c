@@ -528,6 +528,7 @@ static int wifi_evt_scan_done(struct wifi_device *wifi_dev, char *data, int len)
     msg->type = STA_SCAN_TYPE;
     msg->arg1 = scan_ap_cnt;
     k_msg_put(g_wifi_mgmt_queue, &msg, osWaitForever);
+    scan_ap_cnt = 0;
 
     LOG_DBG("STA SCAN DONE");
 

@@ -10,7 +10,7 @@
 #include "sipc.h"
 #include "sipc_priv.h"
 #include "uwp_sys_wrapper.h"
-#include "ipi.h"
+#include "hal_ipi.h"
 
 //#define WIFI_LOG_DBG
 #include "uwp_log.h"
@@ -210,12 +210,6 @@ void smsg_msg_dispatch_thread(const char *arg)
 
 }
 
-static void smsg_irq_handler(void *arg)
-{
-	struct smsg_ipc *ipc = (struct smsg_ipc *)arg;
-	k_sem_release(ipc->irq_sem);
-}
-
 int smsg_ipc_destroy(u8_t dst)
 {
 	struct smsg_ipc *ipc = &smsg_ipcs[dst];
@@ -319,7 +313,8 @@ int smsg_send_irq(u8_t dst, struct smsg *msg)
 
 	/* update wrptr */
 	sys_write32(sys_read32(tx_buf->wrptr) + 1, tx_buf->wrptr);
-	uwp_ipi_irq_trigger();
+
+    uwp_ipi_trigger(IPI_CORE_BTWF, IPI_TYPE_IRQ0);
 
 send_failed:
 	return ret;
@@ -366,7 +361,7 @@ int smsg_send(u8_t dst, u8_t prio, struct smsg *msg, int timeout)
 
     /* sometimes response to CP however the channel is not created at AP */
 	if(ch->txlock == NULL){
-		LOG_ERR("channel:%d create txlock",msg->channel);
+		//LOG_ERR("channel:%d create txlock",msg->channel);
         ch->txlock = k_mutex_create();
 	}
 
@@ -386,9 +381,24 @@ int smsg_send(u8_t dst, u8_t prio, struct smsg *msg, int timeout)
 	sys_write32(sys_read32(tx_buf->wrptr) + 1, tx_buf->wrptr);
 	k_mutex_unlock(ch->txlock);
 
-	uwp_ipi_irq_trigger();
+    uwp_ipi_trigger(IPI_CORE_BTWF, IPI_TYPE_IRQ0);
 
 	return ret;
+}
+
+static void smsg_irq_handler(void *arg)
+{
+    struct smsg_ipc *ipc = &smsg_ipcs[0];
+
+    NVIC_DisableIRQ(GNSS2BTWIFI_IPI_IRQn);
+
+    LOG_DBG("\r\nipi\r\n");
+
+    uwp_ipi_clear_remote(IPI_CORE_BTWF, IPI_TYPE_IRQ0);
+
+    k_sem_release(ipc->irq_sem);
+
+    NVIC_EnableIRQ(GNSS2BTWIFI_IPI_IRQn);
 }
 
 int smsg_init(u32_t dst, u32_t smsg_base)
@@ -403,13 +413,22 @@ int smsg_init(u32_t dst, u32_t smsg_base)
 	smsg_clear_queue(ipc, QUEUE_PRIO_HIGH);
 	smsg_clear_queue(ipc, QUEUE_PRIO_IRQ);
 
-	uwp_ipi_set_callback(smsg_irq_handler, (void *)ipc);
+	//uwp_ipi_set_callback(smsg_irq_handler, (void *)ipc);
 
-	ipc->irq_sem = k_sem_create(15, 0);
+	ipc->irq_sem = k_sem_create(1, 0);
 
     ipc->pid = k_thread_create("smsg_thread",smsg_msg_dispatch_thread,NULL,NULL,SMSG_STACK_SIZE,osPriorityNormal);
     if(ipc->pid == NULL)
         LOG_ERR("smsg thread create failed");
+#if 1
+    NVIC_DisableIRQ(GNSS2BTWIFI_IPI_IRQn);
+    uwp_sys_enable(BIT(APB_EB_IPI));
+    uwp_sys_reset(BIT(APB_EB_IPI));
+    // TODO: isr priority
+    NVIC_SetPriority(GNSS2BTWIFI_IPI_IRQn,0x1FUL);
+    NVIC_SetVector(GNSS2BTWIFI_IPI_IRQn,(uint32_t)smsg_irq_handler);
+    NVIC_EnableIRQ(GNSS2BTWIFI_IPI_IRQn);
+#endif
 
 	return (ipc->pid == NULL);
 }
