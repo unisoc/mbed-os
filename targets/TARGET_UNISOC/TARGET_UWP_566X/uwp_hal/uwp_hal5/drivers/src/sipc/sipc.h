@@ -185,7 +185,10 @@ struct sblock {
 
 extern int sipc_probe(void);
 extern void wifi_irq_init(void);
-int sipc_init(void);
+extern void sprd_bt_irq_init(void);
+extern int sipc_init(void);
+extern void sprd_wifi_irq_disable_num(u32_t num);
+extern void sprd_wifi_irq_enable_num(u32_t num);
 
 #ifdef __cplusplus
 }

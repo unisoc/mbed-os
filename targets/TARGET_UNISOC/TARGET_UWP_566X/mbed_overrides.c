@@ -17,7 +17,6 @@
 #include "hal_sfc.h"
 #include "uwp_intc.h"
 #include "sipc.h"
-#include "ipi.h"
 
 /* This function is called after RAM initialization and before main. */
 extern int uwp_flash_init(void);
@@ -36,6 +35,6 @@ void mbed_main(void){
         printf("flash_init_supplement failed\r\n");
     }
     sipc_init();
-    ipi_uwp_init();
+    uwp_cp_init();
 }
 
