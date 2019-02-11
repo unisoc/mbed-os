@@ -14,7 +14,8 @@ extern "C" {
 #include <stdio.h>
 #include <mbed_interface.h>
 
-#define printk printf
+#define printk mbed_error_printf
+extern void mbed_error_printf(const char *format, ...);
 
 #define REG_IPI_INT_GEN			(BASE_IPI + 0x0)
 #define REG_IPI_INT_CLR_COREN	(BASE_IPI + 0x4)

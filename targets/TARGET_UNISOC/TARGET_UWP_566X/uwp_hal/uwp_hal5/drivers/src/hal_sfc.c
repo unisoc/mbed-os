@@ -145,6 +145,7 @@ __ramfunc BYTE_NUM_E spi_flash_addr(u32_t *addr, u32_t support_4addr)
 	cmd[3] = ((address >> 24) & (0xFF));
 
 	if (support_4addr == TRUE) {
+#undef BIG_ENDIAN
 #ifdef BIG_ENDIAN
 		*addr = (cmd[3] << 0) | (cmd[2] << 8) |
 			(cmd[1] << 16) | (cmd[0] << 24);
