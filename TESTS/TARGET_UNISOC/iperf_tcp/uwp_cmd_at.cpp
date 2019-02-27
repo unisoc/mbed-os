@@ -38,6 +38,12 @@ int conn(char *ssid, char *pw, char *bssid)
         return -1;
     }
 }
+int do_wsscan( cmd_tbl_t *cmd, int argc, char *argv[])
+{
+    wifi.scan(NULL,0);
+
+    return 0;
+}
 
 int do_wsconn( cmd_tbl_t *cmd, int argc, char *argv[])
 {
@@ -162,6 +168,10 @@ void add_cmd()
             "AT+H               - check AT help"
         },
         /*WIFI CMD*/
+        {
+            "AT+WSSCAN",        1,   do_wsscan,
+            "AT+WSSCAN          - start wifi scan"
+        },
         {
             "AT+WSCONN",        3,   do_wsconn,
             "AT+WSCONN          - start wifi connect"
