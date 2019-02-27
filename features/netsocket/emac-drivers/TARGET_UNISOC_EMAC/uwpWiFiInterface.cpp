@@ -164,7 +164,7 @@ nsapi_error_t UWPWiFiInterface::connect(const char *ssid, const char *pass,
 nsapi_error_t UWPWiFiInterface::connect()
 {
     printf("%s\r\n",__func__);
-    return NSAPI_ERROR_OK;
+    return connect(_ssid, _pass, _security, _channel);
 }
 // TODO: return value
 nsapi_error_t UWPWiFiInterface::disconnect()
