@@ -700,6 +700,7 @@ int uwp_mgmt_scan(uint8_t band, uint8_t channel, const char* ssid)
         return -ENOMEM;
     }
 
+    uwp_mgmt_empty_scan_result_list();
 
     ret = wifi_cmd_scan(&(uwp_wifi_dev.wifi_dev[0]), &para);
     if(ret != 0) {
@@ -739,6 +740,20 @@ int uwp_mgmt_get_scan_result(void *buf, int num){
     }
 
     return cnt;
+}
+
+void uwp_mgmt_empty_scan_result_list() {
+    struct list_head *p_node = NULL, *p_del = NULL;
+    struct list_head *p_head = &g_scan_list;
+
+    p_node = p_head->next;
+    while(p_node != p_head){
+        p_node->next->prev = p_node->prev;
+        p_node->prev->next = p_node->next;
+        p_del = p_node;
+        p_node = p_node->next;
+        free((void *)LIST_FIND_ENTRY(p_del, scan_result_info_t, res_list));
+    }
 }
 
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel)
