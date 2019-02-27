@@ -21,9 +21,10 @@ int conn(char *ssid, char *pw, char *bssid)
         RDA_AT_PRINT("wifi init failed\r\n");
         return -1;
     }
-    wifi.scan(&res,1);
+    //wifi.scan(&res,1);
     ret = wifi.connect(ssid, pw, NSAPI_SECURITY_NONE, 0);
     if(ret != 0){
+        RDA_AT_PRINT("wifi connect failed: %s\n", ret);
         return -1;
     }
     ip_addr = wifi.get_ip_address();

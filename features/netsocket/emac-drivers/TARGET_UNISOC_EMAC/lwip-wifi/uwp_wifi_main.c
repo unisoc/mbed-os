@@ -714,6 +714,25 @@ int uwp_mgmt_scan(uint8_t band, uint8_t channel, const char* ssid)
     free(msg);
     return ret;
 }
+
+bool uwp_mgmt_scan_result_name(const char *name)
+{
+    bool find = false;
+    struct list_head *p_node = NULL;
+    struct list_head *p_head = &g_scan_list;
+    struct event_scan_result *res;
+
+    p_node = p_head->next;
+    while(p_node != p_head){
+        res = (struct event_scan_result *)LIST_FIND_ENTRY(p_node, scan_result_info_t, res_list);
+        printf("ap:%s\r\n", (const char *)(res->ssid));
+        if(!strcmp((const char *)(res->ssid), name)
+)
+            find = true;
+        p_node = p_node->next;
+    }
+
+    return find;
 }
 
 int uwp_mgmt_get_scan_result(void *buf, int num){
