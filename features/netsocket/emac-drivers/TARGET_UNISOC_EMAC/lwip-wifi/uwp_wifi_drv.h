@@ -39,6 +39,8 @@ struct wifi_drv_start_ap_params {
 struct wifi_drv_scan_params {
 	unsigned char band;
 	unsigned char channel;
+    char ssid[WIFI_SSID_MAX_LEN];
+    unsigned char ssid_len;
 };
 
 struct wifi_drv_scan_result {

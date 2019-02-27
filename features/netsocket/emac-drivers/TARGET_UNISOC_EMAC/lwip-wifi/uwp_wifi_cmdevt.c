@@ -118,77 +118,77 @@ int wifi_cmd_load_ini(const u8_t *data, u32_t len, u8_t sec_num)
 
 int wifi_cmd_scan(struct wifi_device *wifi_dev, struct wifi_drv_scan_params *params)
 {
-	int ret;
-	int ssid_len = 0;
-	int cmd_len = 0;
-	struct cmd_scan *cmd;
-	u16_t channels_5g_cnt = 0;
-	u8_t band = params->band;
-	u8_t channel = params->channel;
+    int ret;
+    int ssid_len = 0;
+    int cmd_len = 0;
+    u8_t *cmd = NULL; //	use a u8_t* instead of struct cmd_scan*, because the len of ssid[] is unfixed.
+    u16_t channels_5g_cnt = 0;
+    u8_t band = params->band;
+    u8_t channel = params->channel;
+    u32_t *u2g_channel_list;
+    u16_t *u5g_channel_cnt;
+    u16_t *u5g_channel_list;
 
-	cmd_len = sizeof(*cmd) + ssid_len;
+    if(params->ssid_len)
+        ssid_len = 1 + params->ssid_len;
+	cmd_len = sizeof(struct cmd_scan) + ssid_len;
+
+    if (band != WIFI_BAND_2_4G) {
+        if ((band != WIFI_BAND_5G) && (channel != 0)) {
+            LOG_ERR("Invalid band %d, channel %d.",
+					band, channel);
+			return -EINVAL;
+        }
+        if (channel == 0) //all 5g channels
+            cmd_len +=  sizeof(channels_5g_scan_table);
+        else
+            cmd_len += 1;
+    }
+
+	cmd = malloc(cmd_len);
+	if (!cmd) {
+		LOG_ERR("Cmd is null");
+		return -ENOMEM;
+	}
+    memset(cmd, 0, cmd_len);
+
+    if (params->ssid_len) {
+        printf("%s: ssid:%s strlen(ssid):%d\r\n", __func__, params->ssid, params->ssid_len);
+        ((struct cmd_scan*)cmd)->ssid_len = ssid_len;
+        ((struct cmd_scan*)cmd)->ssid[0] = params->ssid_len;
+        memcpy(((struct cmd_scan*)cmd)->ssid+1, params->ssid, params->ssid_len);
+    } else
+        printf("%s: ssid:NULL\r\n", __func__);
+
+    u2g_channel_list = (u32_t*)(cmd + sizeof(struct trans_hdr));
+    u5g_channel_cnt = (u16_t*)(((struct cmd_scan*)cmd)->ssid + ssid_len);
+    u5g_channel_list = u5g_channel_cnt+1;
 
 	switch (band) {
 	case WIFI_BAND_2_4G:
-		cmd = malloc(cmd_len);
-		if (!cmd) {
-			LOG_ERR("Cmd is null");
-			return -ENOMEM;
-		}
 
 		if (channel == 0) { /* All 2.4GH channel */
-			cmd->channels_2g = ALL_2_4_GHZ_CHANNELS;
+			*u2g_channel_list = ALL_2_4_GHZ_CHANNELS;
 		} else { /* One channel */
-			cmd->channels_2g = CHANNEL_2_4_GHZ_BIT(channel);
+			*u2g_channel_list = CHANNEL_2_4_GHZ_BIT(channel);
 		}
 		break;
 	case WIFI_BAND_5G:
 		if (channel == 0) { /* All 5GHZ channel */
-			cmd_len +=  sizeof(channels_5g_scan_table);
-
-			cmd = malloc(cmd_len);
-			if (!cmd) {
-				LOG_ERR("cmd is null");
-				return -ENOMEM;
-			}
-			memset(cmd, 0, cmd_len);
-
-			channels_5g_cnt = ARRAY_SIZE(channels_5g_scan_table);
-			memcpy(cmd->channels_5g, channels_5g_scan_table,
+			*u5g_channel_cnt = ARRAY_SIZE(channels_5g_scan_table);
+			memcpy(u5g_channel_list, channels_5g_scan_table,
 					sizeof(channels_5g_scan_table));
 		} else { /* One channel */
-			cmd_len += 1;
-
-			cmd = malloc(cmd_len);
-			if (!cmd) {
-				LOG_ERR("cmd is null");
-				return -ENOMEM;
-			}
-			memset(cmd, 0, cmd_len);
-
-			channels_5g_cnt = 1;
-			*(cmd->channels_5g) = channel;
+			*u5g_channel_cnt = 1;
+			u5g_channel_list[0] = channel;
 		}
-
-		cmd->channels_5g_cnt = channels_5g_cnt;
 		break;
 	default:
 		if (channel == 0) { /* All channels */
-			cmd_len += sizeof(channels_5g_scan_table);
-
-			cmd = malloc(cmd_len);
-			if (!cmd) {
-				LOG_ERR("cmd is null");
-				return -ENOMEM;
-			}
-			memset(cmd, 0, cmd_len);
-
-			channels_5g_cnt = ARRAY_SIZE(channels_5g_scan_table);
-			cmd->channels_5g_cnt = channels_5g_cnt;
-			memcpy(cmd->channels_5g, channels_5g_scan_table,
+			*u5g_channel_cnt = ARRAY_SIZE(channels_5g_scan_table);
+			memcpy(u5g_channel_list, channels_5g_scan_table,
 					sizeof(channels_5g_scan_table));
-
-			cmd->channels_2g = ALL_2_4_GHZ_CHANNELS;
+			*u2g_channel_list = ALL_2_4_GHZ_CHANNELS;
 		} else {
 			LOG_ERR("Invalid band %d, channel %d.",
 					band, channel);

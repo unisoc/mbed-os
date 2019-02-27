@@ -90,7 +90,9 @@ static inline u32_t uwp_get_addr_from_payload(u32_t payload)
 
 int uwp_cp_init(void);
 int uwp_mgmt_open(void);
-int uwp_mgmt_scan(uint8_t band, uint8_t channel);
+void uwp_mgmt_empty_scan_result_list();
+int uwp_mgmt_scan(uint8_t band, uint8_t channel, const char* ssid);
+bool uwp_mgmt_scan_result_name(const char *name);
 int uwp_mgmt_get_scan_result(void *buf, int num);
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel);
 int uwp_mgmt_tx(uint8_t *pkt, uint32_t pkt_len);

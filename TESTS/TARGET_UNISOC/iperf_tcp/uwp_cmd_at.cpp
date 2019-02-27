@@ -22,11 +22,10 @@ int conn(char *ssid, char *pw, char *bssid)
         RDA_AT_PRINT("wifi init failed\r\n");
         return -1;
     }
-    RDA_AT_PRINT("wifi scan.\r\n");
-    wifi.scan(&res,1);
-    RDA_AT_PRINT("wifi connect.\r\n");
+    //wifi.scan(&res,1);
     ret = wifi.connect(ssid, pw, NSAPI_SECURITY_NONE, 0);
     if(ret != 0){
+        RDA_AT_PRINT("wifi connect failed: %s\n", ret);
         return -1;
     }
     ip_addr = wifi.get_ip_address();
@@ -38,6 +37,12 @@ int conn(char *ssid, char *pw, char *bssid)
         RDA_AT_PRINT("No Client IP Address\r\n");
         return -1;
     }
+}
+int do_wsscan( cmd_tbl_t *cmd, int argc, char *argv[])
+{
+    wifi.scan(NULL,0);
+
+    return 0;
 }
 
 int do_wsconn( cmd_tbl_t *cmd, int argc, char *argv[])
@@ -163,6 +168,10 @@ void add_cmd()
             "AT+H               - check AT help"
         },
         /*WIFI CMD*/
+        {
+            "AT+WSSCAN",        1,   do_wsscan,
+            "AT+WSSCAN          - start wifi scan"
+        },
         {
             "AT+WSCONN",        3,   do_wsconn,
             "AT+WSCONN          - start wifi connect"

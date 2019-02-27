@@ -679,13 +679,20 @@ int uwp_mgmt_open(void){
     return ret;
 }
 
-int uwp_mgmt_scan(uint8_t band, uint8_t channel)
+int uwp_mgmt_scan(uint8_t band, uint8_t channel, const char* ssid)
 {
     int ret = -1;
     struct wifi_drv_scan_params para;
     para.band = band;
     para.channel = channel;
+    para.ssid_len = 0;
     uwp_wifi_msg_t msg = NULL;
+    if ((ssid != NULL) && (strlen(ssid) <= WIFI_SSID_MAX_LEN)) {
+        para.ssid_len = strlen(ssid);
+        memcpy(para.ssid, ssid, para.ssid_len);
+    } else if (strlen(ssid) > WIFI_SSID_MAX_LEN) {
+        LOG_ERR("ssid len is too long:%s %d\n",ssid, strlen(ssid));
+    }
 
     g_wifi_mgmt_queue = k_msg_create(10);
     if(g_wifi_mgmt_queue == NULL){
@@ -693,15 +700,39 @@ int uwp_mgmt_scan(uint8_t band, uint8_t channel)
         return -ENOMEM;
     }
 
+    uwp_mgmt_empty_scan_result_list();
+
     ret = wifi_cmd_scan(&(uwp_wifi_dev.wifi_dev[0]), &para);
-    if(ret != 0)
+    if(ret != 0) {
+        LOG_ERR("scan cmd send fail\n");
         return ret;
+    }
     k_msg_get(g_wifi_mgmt_queue, &msg, 10000);
     if(msg->type == STA_SCAN_TYPE)
         ret = msg->arg1;
     LOG_DBG("find ap:%d",ret);
     free(msg);
     return ret;
+}
+
+bool uwp_mgmt_scan_result_name(const char *name)
+{
+    bool find = false;
+    struct list_head *p_node = NULL;
+    struct list_head *p_head = &g_scan_list;
+    struct event_scan_result *res;
+
+    p_node = p_head->next;
+    while(p_node != p_head){
+        res = (struct event_scan_result *)LIST_FIND_ENTRY(p_node, scan_result_info_t, res_list);
+        printf("ap:%s\r\n", (const char *)(res->ssid));
+        if(!strcmp((const char *)(res->ssid), name)
+)
+            find = true;
+        p_node = p_node->next;
+    }
+
+    return find;
 }
 
 int uwp_mgmt_get_scan_result(void *buf, int num){
@@ -728,6 +759,20 @@ int uwp_mgmt_get_scan_result(void *buf, int num){
     }
 
     return cnt;
+}
+
+void uwp_mgmt_empty_scan_result_list() {
+    struct list_head *p_node = NULL, *p_del = NULL;
+    struct list_head *p_head = &g_scan_list;
+
+    p_node = p_head->next;
+    while(p_node != p_head){
+        p_node->next->prev = p_node->prev;
+        p_node->prev->next = p_node->next;
+        p_del = p_node;
+        p_node = p_node->next;
+        free((void *)LIST_FIND_ENTRY(p_del, scan_result_info_t, res_list));
+    }
 }
 
 int uwp_mgmt_connect(const char *ssid, const char *password, uint8_t channel)
