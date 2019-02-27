@@ -415,7 +415,7 @@ int smsg_init(u32_t dst, u32_t smsg_base)
 
 	//uwp_ipi_set_callback(smsg_irq_handler, (void *)ipc);
 
-	ipc->irq_sem = k_sem_create(1, 0);
+	ipc->irq_sem = k_sem_create(15, 0);
 
     ipc->pid = k_thread_create("smsg_thread",smsg_msg_dispatch_thread,NULL,NULL,SMSG_STACK_SIZE,osPriorityNormal);
     if(ipc->pid == NULL)
