@@ -4,7 +4,7 @@
 //#define WIFI_LOG_DBG
 #include "uwp_log.h"
 
-static char wifi_reserve_ram[CONFIG_UWP_PKT_BUF_MAX * CONFIG_UWP_PKT_BUF_SIZE];
+static char wifi_reserve_ram[CONFIG_UWP_PKT_BUF_MAX * CONFIG_UWP_PKT_BUF_SIZE] __attribute__ ( (section(".SECTIONWIFIDATARESERVE")) );
 static struct list_head wifi_buf_list_employ;
 static struct list_head wifi_buf_list_free;
 int wifi_rx_employ_num = 0;
