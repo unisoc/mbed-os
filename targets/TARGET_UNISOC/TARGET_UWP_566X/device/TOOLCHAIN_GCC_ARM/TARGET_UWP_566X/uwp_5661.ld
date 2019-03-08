@@ -3,9 +3,10 @@
 /* Linker script to configure memory regions. */
 MEMORY
 {
-    FLASH (rx)      : ORIGIN = 0x02000000, LENGTH = 256K
-    IRAM (rwx)      : ORIGIN = 0x0010010c, LENGTH = (512K - 0x10c)
-    DRAM (rwx)      : ORIGIN = 0x00180000, LENGTH = 408K
+    FLASH (rx)        : ORIGIN = 0x02000000, LENGTH = 256K
+    IRAM (rwx)        : ORIGIN = 0x0010010c, LENGTH = (324K - 0x10c)
+    RESERVE_RAM (rwx) : ORIGIN = 0x00151000, LENGTH = 188K
+    DRAM (rwx)        : ORIGIN = 0x00180000, LENGTH = 408K
 /*    IDT_LIST (rwx)  : ORIGIN = 0x100000 + 920K, LENGTH = 2K   */
 }
 
@@ -168,11 +169,9 @@ SECTIONS
        placed in these higher RAM banks where
        they will be left uninitialized.
     */
-/*    .SECTIONRESERVED1 (NOLOAD):
+    .SECTIONWIFIDATARESERVE (NOLOAD):
     {
-        Image$$RW_IRAM2$$Base = . ;
-        *(SECTIONRESERVED1)
-        Image$$RW_IRAM2$$ZI$$Limit = .;
-    } > MACLIB_RAM */
+        *(SECTIONWIFIDATARESERVE)
+    } > RESERVE_RAM
 
 }
